@@ -11,6 +11,7 @@ import 'package:mcappen/assets/Secrets.dart';
 import 'package:navigation_dot_bar/navigation_dot_bar.dart';
 
 import 'components/SearchComponent.dart';
+import 'components/WeatherComponent.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key, required this.title}) : super(key: key);
@@ -23,13 +24,25 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   LatLng _initialPosition = LatLng(0.0, 0.0);
   MyLocationTrackingMode trackingMode = MyLocationTrackingMode.None;
+  MapboxMapController? mapController;
+  bool mapReady = false;
   int currentPage = 1;
   
   
   void onMapLoaded(MapboxMapController controller) async {
     setState(() {
+      mapController = controller;
+      mapReady = true;
       trackingMode = MyLocationTrackingMode.Tracking;
     });
+  }
+  
+  Widget weatherComponent() {
+    if(mapController != null){
+      return WeatherComponent(mapController: mapController!);
+    } else {
+      return Container();
+    }
   }
   
   void cameraTrackingMode(MyLocationTrackingMode newTrackingMode) {
@@ -75,8 +88,11 @@ class _HomePageState extends State<HomePage> {
             myLocationTrackingMode: trackingMode,
             onCameraTrackingChanged: cameraTrackingMode,
             onMapClick: mapClick,
+            trackCameraPosition: true,
           ),
+          weatherComponent(),
           SearchComponent(),
+          
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -86,6 +102,7 @@ class _HomePageState extends State<HomePage> {
         ),
         onPressed: changeTrackingMode,
       ),
+      
       bottomNavigationBar: SafeArea(
         child: BottomNavigationDotBar (
           initialPosition: 1,
@@ -96,6 +113,7 @@ class _HomePageState extends State<HomePage> {
           ]
         ),   
       )
+      
     );
   }
 }

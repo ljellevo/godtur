@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:mcappen/widgets/TextEntryField.dart';
 
 class SearchComponent extends StatefulWidget {
@@ -28,7 +27,6 @@ class _SearchComponentState extends State<SearchComponent> {
   }
   
   void searchFieldChanged(String text) {
-
     setState(() {
       _containerColor = text != "" ? Colors.white : Colors.transparent;
       _showSearchResult = text != "" ? true : false;
@@ -37,11 +35,22 @@ class _SearchComponentState extends State<SearchComponent> {
   
   
   void isSearchActive(bool focus) {
-    print("Search state changed");
     setState(() {
       _containerColor = focus ? Colors.white : Colors.transparent;
-      _showSearchResult = focus;
+      _showSearchResult = focus;        
     });
+  }
+  
+  List<BoxShadow>? _containerBoxShadow() {
+    if(_showSearchResult){
+      return [BoxShadow(
+          color: Colors.grey.withOpacity(0.5),
+          spreadRadius: 5,
+          blurRadius: 7,
+          offset: Offset(0, 3),
+        )
+      ];
+    } 
   }
   
   Widget searchResult() {
@@ -79,8 +88,11 @@ class _SearchComponentState extends State<SearchComponent> {
           top: 0,
           right: 0,
           child: Container(
-            color: _containerColor,
-            padding: EdgeInsets.fromLTRB(15, 50, 15, 0),
+            decoration: BoxDecoration(
+              color: _containerColor,
+              boxShadow: _containerBoxShadow()
+            ),
+            padding: EdgeInsets.fromLTRB(15, 50, 15, 15),
             child: TextEntryField(
               searchController: searchController,
               searchActiveState: isSearchActive,
