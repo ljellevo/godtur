@@ -10,8 +10,8 @@ import 'package:mcappen/assets/Secrets.dart';
 
 import 'package:navigation_dot_bar/navigation_dot_bar.dart';
 
-import 'components/SearchComponent.dart';
-import 'components/WeatherComponent.dart';
+import '../components/SearchComponent.dart';
+import '../components/WeatherComponent.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key, required this.title}) : super(key: key);
@@ -113,7 +113,6 @@ class _HomePageState extends State<HomePage> {
           ]
         ),   
       )
-      
     );
   }
 }
