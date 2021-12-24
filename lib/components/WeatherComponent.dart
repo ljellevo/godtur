@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:http/http.dart' as http;
+import 'package:mcappen/utils/Network.dart';
 
 class WeatherComponent extends StatefulWidget {
   final MapboxMapController mapController;
@@ -33,13 +35,21 @@ class _WeatherComponentState extends State<WeatherComponent> {
     widget.mapController.addListener(getBounds);
     markers = widget.mapController.addSymbols(weatherMarkers);
     mapHasMarker = true;
+    //fetchAlbum();
+    
   }
+
   
   void getBounds() async {
     LatLngBounds visibleLocation = await widget.mapController.getVisibleRegion();
     //print(visibleLocation.northeast.toString() + " - " + visibleLocation.southwest.toString());
     zoom = widget.mapController.cameraPosition!.zoom;
     List<Symbol>? mark = await markers;
+    determineBackground(mark, zoom);
+    //new Network().getLocationsWithinViewportBounds(await widget.mapController.getVisibleRegion());
+  }
+  
+  void determineBackground(List<Symbol>? mark, double zoom) {
     if(zoom < 11) {
       setState(() {
         //mapColor = Color(0xFFFFE306).withOpacity(0.3);
@@ -59,6 +69,7 @@ class _WeatherComponentState extends State<WeatherComponent> {
       });
     }
   }
+  
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(

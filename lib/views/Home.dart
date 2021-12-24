@@ -7,6 +7,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:mcappen/assets/Secrets.dart';
+import 'package:mcappen/utils/LocationManager.dart';
+import 'package:mcappen/utils/Network.dart';
 
 import 'package:navigation_dot_bar/navigation_dot_bar.dart';
 
@@ -22,6 +24,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  Network network = new Network();
   LatLng _initialPosition = LatLng(0.0, 0.0);
   MyLocationTrackingMode trackingMode = MyLocationTrackingMode.None;
   MapboxMapController? mapController;
@@ -51,7 +54,10 @@ class _HomePageState extends State<HomePage> {
     });
   }
   
-  void changeTrackingMode() {
+
+  
+  void changeTrackingMode() async {
+    
     if(trackingMode == MyLocationTrackingMode.Tracking) {
       setState(() {
         trackingMode = MyLocationTrackingMode.None;
@@ -70,7 +76,9 @@ class _HomePageState extends State<HomePage> {
     }
   }
   
-
+  void onMapIdle() {
+    new LocationManager(network: network).getForecastsWithinViewportBounds(mapController);
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -89,8 +97,9 @@ class _HomePageState extends State<HomePage> {
             onCameraTrackingChanged: cameraTrackingMode,
             onMapClick: mapClick,
             trackCameraPosition: true,
+            onCameraIdle: onMapIdle,
           ),
-          weatherComponent(),
+          //weatherComponent(),
           SearchComponent(),
           
         ],

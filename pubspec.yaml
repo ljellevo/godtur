@@ -36,6 +36,7 @@ dependencies:
   # mapbox_gl: 0.13.0
   mapbox_gl: 
     path: /Users/ludvigellevold/dev/Libraries/flutter-mapbox-gl/
+  http: ^0.13.4
 
 dev_dependencies:
   flutter_test:
