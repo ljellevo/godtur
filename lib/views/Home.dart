@@ -1,19 +1,12 @@
-
-
-
 import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:mcappen/assets/Secrets.dart';
 import 'package:mcappen/utils/LocationManager.dart';
 import 'package:mcappen/utils/Network.dart';
-
 import 'package:navigation_dot_bar/navigation_dot_bar.dart';
-
 import '../components/SearchComponent.dart';
-import '../components/WeatherComponent.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key, required this.title}) : super(key: key);
@@ -24,40 +17,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Network network = new Network();
-  LatLng _initialPosition = LatLng(0.0, 0.0);
   MyLocationTrackingMode trackingMode = MyLocationTrackingMode.None;
   MapboxMapController? mapController;
+  Network network = new Network();
+  LatLng _initialPosition = LatLng(0.0, 0.0);
   bool mapReady = false;
   int currentPage = 1;
+  List<Symbol> markers = [];
   
-  
-  void onMapLoaded(MapboxMapController controller) async {
-    setState(() {
-      mapController = controller;
-      mapReady = true;
-      trackingMode = MyLocationTrackingMode.Tracking;
-    });
-  }
-  
-  Widget weatherComponent() {
-    if(mapController != null){
-      return WeatherComponent(mapController: mapController!);
-    } else {
-      return Container();
-    }
-  }
-  
-  void cameraTrackingMode(MyLocationTrackingMode newTrackingMode) {
-    setState(() {
-      trackingMode = newTrackingMode;
-    });
-  }
-  
-
-  
-  void changeTrackingMode() async {
-    
+  void changeTrackingMode() async {  
     if(trackingMode == MyLocationTrackingMode.Tracking) {
       setState(() {
         trackingMode = MyLocationTrackingMode.None;
@@ -69,6 +37,20 @@ class _HomePageState extends State<HomePage> {
     }
   }
   
+  void onMapLoaded(MapboxMapController controller) async {
+    setState(() {
+      mapController = controller;
+      mapReady = true;
+      trackingMode = MyLocationTrackingMode.Tracking;
+    });
+  }
+  
+  void cameraTrackingMode(MyLocationTrackingMode newTrackingMode) {
+    setState(() {
+      trackingMode = newTrackingMode;
+    });
+  }
+  
   void mapClick(Point<double> point, LatLng coordinates) {
     FocusScopeNode currentFocus = FocusScope.of(context);
     if (!currentFocus.hasPrimaryFocus) {
@@ -76,9 +58,15 @@ class _HomePageState extends State<HomePage> {
     }
   }
   
-  void onMapIdle() {
-    new LocationManager(network: network).getForecastsWithinViewportBounds(mapController);
+  void onMapIdle() async {
+    if(mapController != null) {
+      List<SymbolOptions> forecastSymbols = await new LocationManager(network: network).getForecastsWithinViewportBounds(mapController);
+      mapController!.removeSymbols(markers);
+      markers = await mapController!.addSymbols(forecastSymbols);
+    }
   }
+  
+
   
   @override
   Widget build(BuildContext context) {
@@ -99,9 +87,7 @@ class _HomePageState extends State<HomePage> {
             trackCameraPosition: true,
             onCameraIdle: onMapIdle,
           ),
-          //weatherComponent(),
-          SearchComponent(),
-          
+          SearchComponent(network: network),
         ],
       ),
       floatingActionButton: FloatingActionButton(

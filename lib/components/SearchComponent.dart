@@ -1,9 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mcappen/Classes/Location.dart';
+import 'package:mcappen/utils/Network.dart';
 import 'package:mcappen/widgets/TextEntryField.dart';
 
 class SearchComponent extends StatefulWidget {
-  SearchComponent({Key? key}) : super(key: key);
+  final Network network;
+  SearchComponent({
+    required this.network,
+    Key? key
+    }) : super(key: key);
   
 
   @override
@@ -15,9 +21,21 @@ class SearchComponent extends StatefulWidget {
 class _SearchComponentState extends State<SearchComponent> {
   Color _containerColor = Colors.transparent;
   bool _showSearchResult = false;
-  final List<String> entries = <String>['A', 'B', 'C'];
-  final List<int> colorCodes = <int>[600, 500, 100];
+  List<Location> entries = [];
+  //final List<int> colorCodes = <int>[600, 500, 100];
   TextEditingController searchController = TextEditingController();
+  
+  @override
+  void initState() {
+    super.initState();
+    searchController.addListener(searchFieldChanged);
+  }
+  
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
   
   void searchbarFocusChanged(FocusNode focus) {
     setState(() {
@@ -26,10 +44,15 @@ class _SearchComponentState extends State<SearchComponent> {
     });
   }
   
-  void searchFieldChanged(String text) {
+  void searchFieldChanged() async {
+    List<Location> locations = [];
+    if(searchController.value.text != "") {
+      locations = await widget.network.getLocationBySearch(searchController.value.text);
+    }
     setState(() {
-      _containerColor = text != "" ? Colors.white : Colors.transparent;
-      _showSearchResult = text != "" ? true : false;
+      _containerColor = searchController.value.text != "" ? Colors.white : Colors.transparent;
+      _showSearchResult = searchController.value.text != "" ? true : false;
+      entries = locations;
     });
   }
   
@@ -65,8 +88,7 @@ class _SearchComponentState extends State<SearchComponent> {
             itemBuilder: (BuildContext context, int index) {
               return Container(
                 height: 500,
-                color: Colors.amber[colorCodes[index]],
-                child: Center(child: Text('Entry ${entries[index]}')),
+                child: Center(child: Text('Entry ${entries[index].name}')),
               );
             }
           ),

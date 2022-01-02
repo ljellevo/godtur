@@ -24,6 +24,12 @@ class _TextEntryFieldState extends State<TextEntryField> {
     widget.searchController.addListener(textChanged);
   }
   
+    @override
+  void dispose() {
+    widget.searchController.dispose();
+    super.dispose();
+  }
+  
   void focusListener() {    
     if(focusNode.hasFocus || widget.searchController.value.text != "") {
       setState(() {
