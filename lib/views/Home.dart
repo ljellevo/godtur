@@ -2,7 +2,9 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:mcappen/Classes/Location.dart';
 import 'package:mcappen/assets/Secrets.dart';
+import 'package:mcappen/utils/CameraManager.dart';
 import 'package:mcappen/utils/LocationManager.dart';
 import 'package:mcappen/utils/Network.dart';
 import 'package:navigation_dot_bar/navigation_dot_bar.dart';
@@ -24,6 +26,7 @@ class _HomePageState extends State<HomePage> {
   bool mapReady = false;
   int currentPage = 1;
   List<Symbol> markers = [];
+  TextEditingController searchController = TextEditingController();
   
   void changeTrackingMode() async {  
     if(trackingMode == MyLocationTrackingMode.Tracking) {
@@ -66,6 +69,12 @@ class _HomePageState extends State<HomePage> {
     }
   }
   
+  void moveCameraToLocation(Location location) {
+    if(mapController != null) {
+      CameraManager().moveCamera(controller: mapController!, location: LatLng(location.coordinates[0].latitude, location.coordinates[0].longitude));
+    }
+  }
+  
 
   
   @override
@@ -87,7 +96,7 @@ class _HomePageState extends State<HomePage> {
             trackCameraPosition: true,
             onCameraIdle: onMapIdle,
           ),
-          SearchComponent(network: network),
+          SearchComponent(network: network, searchController: searchController, moveCameraToLocation: moveCameraToLocation),
         ],
       ),
       floatingActionButton: FloatingActionButton(

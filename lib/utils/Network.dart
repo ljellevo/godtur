@@ -34,12 +34,9 @@ class Network {
     String uppLat = bounds.northeast.latitude.toString();
     String uppLon = bounds.northeast.longitude.toString();
     http.Response response = await http.get(Uri.parse('http://192.168.1.146:8080/api/locations?method=bounds&lowLat=' + lowLat + '&lowLon=' + lowLon + '&uppLat=' + uppLat + '&uppLon=' + uppLon + '&access_token=' + token!.accessToken));
-    if(response.body != "null") {
+    if(response.body != "null" && response.statusCode == 200) {
       Iterable locationResponse  = json.decode(response.body) as Iterable;
       List<Location> locations = List<Location>.from(locationResponse.map<Location>((dynamic i) => Location.fromJson(i as Map<String, dynamic>)));
-      for(var i = 0; i < locations.length; i++) {
-        print(locations[i].name);
-      }
       return locations;
       }
     return [];
@@ -47,17 +44,15 @@ class Network {
   
   Future<List<Location>> getLocationBySearch(String searchValue) async {
     await validateToken();
-    http.Response response = await http.get(Uri.parse('http://192.168.1.146:8080/api/locations?method=name&name=' + searchValue + '&access_token=' + token!.accessToken));
-    if(response.body != "null") {
-      Iterable locationResponse  = json.decode(response.body) as Iterable;
-      List<Location> locations = List<Location>.from(locationResponse.map<Location>((dynamic i) => Location.fromJson(i as Map<String, dynamic>)));
-      for(var i = 0; i < locations.length; i++) {
-        print(locations[i].name);
+    http.Response response = await http.get(Uri.parse('http://192.168.1.146:8080/api/locations/search?name=' + searchValue + '&access_token=' + token!.accessToken));
+    if(response.statusCode == 200) {
+      if(response.body != "null") {
+        Iterable locationResponse  = json.decode(response.body) as Iterable;
+        List<Location> locations = List<Location>.from(locationResponse.map<Location>((dynamic i) => Location.fromJson(i as Map<String, dynamic>)));
+        return locations;
       }
-      return locations;
-      }
+    }
     return [];
-    
   }
   
   Future<List<LocationForecast>> getForecastsWithinViewportBounds(LatLngBounds bounds) async {
@@ -67,16 +62,11 @@ class Network {
     String uppLat = bounds.northeast.latitude.toString();
     String uppLon = bounds.northeast.longitude.toString();
     http.Response response = await http.get(Uri.parse('http://192.168.1.146:8080/api/forecast?method=bounds&lowLat=' + lowLat + '&lowLon=' + lowLon + '&uppLat=' + uppLat + '&uppLon=' + uppLon + '&access_token=' + token!.accessToken));
-    if(response.body != "null") {
+    if(response.body != "null" && response.statusCode == 200) {
       Iterable forecastsResponse  = json.decode(response.body) as Iterable;
       List<LocationForecast> locationForecast = List<LocationForecast>.from(forecastsResponse.map<LocationForecast>((dynamic i) => LocationForecast.fromJson(i as Map<String, dynamic>)));
-      print("----------");
-      for(var i = 0; i < locationForecast.length; i++) {
-        print(locationForecast[i].name);
-        print(locationForecast[i].forecast.weather[0].symbolCode);
-      }
       return locationForecast;
-      }
+    }
     return [];
   }
 }

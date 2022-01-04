@@ -4,7 +4,13 @@ import 'package:flutter/material.dart';
 class TextEntryField extends StatefulWidget {
   final Function searchActiveState;
   final TextEditingController searchController;
-  TextEntryField({required this.searchActiveState, required this.searchController, Key? key}) : super(key: key);
+  final FocusNode focusNode;
+  TextEntryField({
+    required this.searchActiveState, 
+    required this.searchController, 
+    required this.focusNode,
+    Key? key
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -13,25 +19,27 @@ class TextEntryField extends StatefulWidget {
 }
 
 class _TextEntryFieldState extends State<TextEntryField> {
-  final focusNode = FocusNode();
+  
   Icon _suffixIcon = Icon(Icons.search);
   bool _isSearchActive = false;
   
   @override
   void initState() {
     super.initState();
-    focusNode.addListener(focusListener);
+    widget.focusNode.addListener(focusListener);
     widget.searchController.addListener(textChanged);
   }
   
-    @override
+  @override
   void dispose() {
     widget.searchController.dispose();
+    widget.focusNode.dispose();
     super.dispose();
   }
   
+  /// Engages the search view when the text entry field is focused and keybaord appears.
   void focusListener() {    
-    if(focusNode.hasFocus || widget.searchController.value.text != "") {
+    if(widget.focusNode.hasFocus) {
       setState(() {
         widget.searchActiveState(true);
         _isSearchActive = true;
@@ -39,15 +47,26 @@ class _TextEntryFieldState extends State<TextEntryField> {
     }
   }
   
+  /// This function is called when the text in the searchfield changes. It sets the correct icon for the right icon button
   void textChanged() {
     setState(() {
       _suffixIcon = widget.searchController.value.text == "" ? Icon(Icons.search) : Icon(Icons.cancel);
     });
   }
   
+  /// Functionality for the search/cancel icon button on the right hand side.
+  void clearSearch() {
+    widget.searchController.clear();
+    setState(() {
+      widget.searchActiveState(true);
+      _isSearchActive = true;
+    });
+  }
+  
+  /// Functionality for the "chevron" button on the left hand side. This function tells the search component to hide the layover view as well as dismisses any potential keyboard.
   void cancelSearch() {
     widget.searchController.clear();
-    focusNode.unfocus();
+    widget.focusNode.unfocus();
     setState(() {
       widget.searchActiveState(false);
       _isSearchActive = false;
@@ -59,7 +78,7 @@ class _TextEntryFieldState extends State<TextEntryField> {
     return Container(
       width: MediaQuery.of(context).size.width,
       child: CupertinoTextField(
-      focusNode: focusNode,
+      focusNode: widget.focusNode,
       controller: widget.searchController,
       placeholder: "Søk etter lokasjon",
       prefix: _isSearchActive ? Container(
@@ -74,7 +93,7 @@ class _TextEntryFieldState extends State<TextEntryField> {
         child: IconButton(
           icon: _suffixIcon,
           onPressed: () {
-            widget.searchController.clear();
+            clearSearch();
           }
         ),
       ),
