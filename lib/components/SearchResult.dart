@@ -1,37 +1,38 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mcappen/Classes/Location.dart';
-import 'package:mcappen/utils/CameraManager.dart';
 import 'package:mcappen/utils/Network.dart';
-import 'package:mcappen/widgets/TextEntryField.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+
 
 typedef LocationCallback = Function(Location location);
+typedef SetSearchResultCallback = Function(Location? location);
 
-class SearchComponent extends StatefulWidget {
+class SearchResult extends StatefulWidget {
   final Network network;
   final TextEditingController searchController;
   final LocationCallback moveCameraToLocation;
-  SearchComponent({
+  final FocusNode focusNode;
+  final bool showSearchResult;
+  final SetSearchResultCallback setSearchResult;
+  SearchResult({
     required this.network,
     required this.searchController,
     required this.moveCameraToLocation,
-    Key? key
-    }) : super(key: key);
+    required this.focusNode,
+    required this.showSearchResult,
+    required this.setSearchResult,
+  Key? key
+  }) : super(key: key);
   
 
   @override
   State<StatefulWidget> createState() {
-    return _SearchComponentState();
+    return _SearchResultState();
   }
 }
 
-class _SearchComponentState extends State<SearchComponent> {
-  Color _containerColor = Colors.transparent;
-  bool _showSearchResult = false;
+class _SearchResultState extends State<SearchResult> {
   List<Location> locations = [];
-  final focusNode = FocusNode();
-  
   
   @override
   void initState() {
@@ -47,7 +48,6 @@ class _SearchComponentState extends State<SearchComponent> {
   
   /// Called whenever text in the text entry field changes
   void searchFieldChanged() async {
-
     if(widget.searchController.value.text != "") {
       locations = await widget.network.getLocationBySearch(widget.searchController.value.text);
     }
@@ -56,42 +56,20 @@ class _SearchComponentState extends State<SearchComponent> {
     });
   }
   
-  /// Shows/hides the search layover view
-  void isSearchActive(bool focus) {
-    setState(() {
-      _containerColor = focus ? Colors.white : Colors.transparent;
-      _showSearchResult = focus;        
-    });
-  }
-  
-  List<BoxShadow>? _containerBoxShadow() {
-    if(_showSearchResult){
-      return [BoxShadow(
-          color: Colors.grey.withOpacity(0.5),
-          spreadRadius: 5,
-          blurRadius: 7,
-          offset: Offset(0, 3),
-        )
-      ];
-    } 
-  }
-  
-  Widget searchResult() {
-    if(_showSearchResult) {
+  Widget searchResultList() {
+    if(widget.showSearchResult) {
       return Positioned.fill(
-        top: 100,
+        top: 130,
         child: Container(
           color: Colors.white,
           child: ListView.builder(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             itemCount: locations.length,
-            itemBuilder: (BuildContext context, int index) {
+            itemBuilder: (BuildContext context, int i) {
               return GestureDetector(
-                child: listCell(index),
+                child: listCell(i),
                 onTap: () {
-                  isSearchActive(false);
-                  focusNode.unfocus();
-                  widget.moveCameraToLocation(locations[index]);
+                  widget.setSearchResult(locations[i]);
                 }
               );
             }
@@ -101,7 +79,6 @@ class _SearchComponentState extends State<SearchComponent> {
     }
     return Container();
   }
-  
   
   Widget listCell(int index) {
     return Container(
@@ -174,28 +151,6 @@ class _SearchComponentState extends State<SearchComponent> {
   
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      fit: StackFit.loose,
-      children: [
-        searchResult(),
-        Positioned(
-          left: 0,
-          top: 0,
-          right: 0,
-          child: Container(
-            decoration: BoxDecoration(
-              color: _containerColor,
-              boxShadow: _containerBoxShadow()
-            ),
-            padding: EdgeInsets.fromLTRB(15, 50, 15, 15),
-            child: TextEntryField(
-              searchController: widget.searchController,
-              searchActiveState: isSearchActive,
-              focusNode: focusNode,
-            )
-          ),
-        )
-      ],
-    );
+    return searchResultList();
   }
 }

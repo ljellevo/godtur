@@ -1,3 +1,10 @@
+/*
+
+Used to create the overlay, intended to use instead of markers when mas is zoomed in beyond a given zoom.
+
+*/
+
+
 import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:http/http.dart' as http;

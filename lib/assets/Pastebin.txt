@@ -46,3 +46,25 @@ void onMapLoaded(MapboxMapController controller) async {
         print("Could not get location");
       }
     }
+    
+    
+  void determineBackground(List<Symbol>? mark, double zoom) {
+    if(zoom < 11) {
+      setState(() {
+        //mapColor = Color(0xFFFFE306).withOpacity(0.3);
+        mapColor = Colors.transparent;
+        if(mark != null && !mapHasMarker) {
+          markers = widget.mapController.addSymbols(weatherMarkers);
+          mapHasMarker = true;
+        }
+      });
+    } else {
+      setState(() {
+        mapColor = Colors.blue.withOpacity(0.3);
+        if(mark != null && mapHasMarker) {
+          widget.mapController.removeSymbols(mark);
+          mapHasMarker = false;
+        }
+      });
+    }
+  }

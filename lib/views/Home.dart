@@ -7,8 +7,10 @@ import 'package:mcappen/assets/Secrets.dart';
 import 'package:mcappen/utils/CameraManager.dart';
 import 'package:mcappen/utils/LocationManager.dart';
 import 'package:mcappen/utils/Network.dart';
+import 'package:mcappen/widgets/Layover.dart';
+import 'package:mcappen/widgets/Search.dart';
 import 'package:navigation_dot_bar/navigation_dot_bar.dart';
-import '../components/SearchComponent.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key, required this.title}) : super(key: key);
@@ -26,28 +28,23 @@ class _HomePageState extends State<HomePage> {
   bool mapReady = false;
   int currentPage = 1;
   List<Symbol> markers = [];
-  TextEditingController searchController = TextEditingController();
+  Location? selectedLocation;
   
-  void changeTrackingMode() async {  
-    if(trackingMode == MyLocationTrackingMode.Tracking) {
-      setState(() {
-        trackingMode = MyLocationTrackingMode.None;
-      });
-    } else {
-      setState(() {
-        trackingMode = MyLocationTrackingMode.Tracking;
-      });
-    }
+  
+  void changeTrackingMode(MyLocationTrackingMode newMode) {  
+    setState(() {
+      trackingMode = newMode;
+    });
   }
   
-  void onMapLoaded(MapboxMapController controller) async {
+  void onMapLoaded(MapboxMapController controller) {
     setState(() {
       mapController = controller;
       mapReady = true;
       trackingMode = MyLocationTrackingMode.Tracking;
     });
   }
-  
+  /// Changes the camera tracking mode
   void cameraTrackingMode(MyLocationTrackingMode newTrackingMode) {
     setState(() {
       trackingMode = newTrackingMode;
@@ -61,6 +58,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
   
+  /// Loads forecasts when the user stops "scrolling" on the map
   void onMapIdle() async {
     if(mapController != null) {
       List<SymbolOptions> forecastSymbols = await new LocationManager(network: network).getForecastsWithinViewportBounds(mapController);
@@ -69,54 +67,121 @@ class _HomePageState extends State<HomePage> {
     }
   }
   
+  /// Moves the camera to a given location, and disables tracking.
   void moveCameraToLocation(Location location) {
     if(mapController != null) {
+      changeTrackingMode(MyLocationTrackingMode.None);
       CameraManager().moveCamera(controller: mapController!, location: LatLng(location.coordinates[0].latitude, location.coordinates[0].longitude));
     }
   }
   
+  void setSelectedLocation(Location? location) {
+    setState(() {
+      selectedLocation = location;
+    });
+  }
+  
+  
+  Widget _floatingPanel(){
+    if(selectedLocation != null) {
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(24.0)),
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 20.0,
+              color: Colors.grey,
+            ),
+          ]
+        ),
+        margin: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  selectedLocation!.name,
+                  style: TextStyle(
+                    fontSize: 28
+                  ),
+                ),
+                Text(
+                  selectedLocation!.locationType,
+                  style: TextStyle(
+                    fontSize: 18
+                  ),
+                )
+              ],
+            )
+          ],
+        )
+      );
+    } else {
+      return Container();
+    }
+  }
 
+  Widget _floatingBody() {
+    return Stack(
+      children: [
+        MapboxMap(
+          accessToken: Secrets.MAPBOX_ACCESS_TOKEN,
+          onMapCreated: onMapLoaded,
+          initialCameraPosition: CameraPosition(target: _initialPosition),
+          styleString: Secrets.MAPBOX_STYLE_URL,
+          myLocationEnabled: true,
+          myLocationTrackingMode: trackingMode,
+          onCameraTrackingChanged: cameraTrackingMode,
+          onMapClick: mapClick,
+          trackCameraPosition: true,
+          onCameraIdle: onMapIdle,
+        ),
+        Search(
+          network: network, 
+          moveCameraToLocation: moveCameraToLocation,
+          setSelectedLocation: setSelectedLocation,
+          selectedLocation: selectedLocation,
+        ),
+      ],
+    );
+  }
   
   @override
   Widget build(BuildContext context) {
+    BorderRadiusGeometry radius = BorderRadius.only(
+      topLeft: Radius.circular(24.0),
+      topRight: Radius.circular(24.0),
+    );
+  
     return Scaffold(
       resizeToAvoidBottomInset: false,
       extendBody: true,
-      body: Stack(
-        children: [
-          MapboxMap(
-            accessToken: Secrets.MAPBOX_ACCESS_TOKEN,
-            onMapCreated: onMapLoaded,
-            initialCameraPosition: CameraPosition(target: _initialPosition),
-            styleString: Secrets.MAPBOX_STYLE_URL,
-            myLocationEnabled: true,
-            myLocationTrackingMode: trackingMode,
-            onCameraTrackingChanged: cameraTrackingMode,
-            onMapClick: mapClick,
-            trackCameraPosition: true,
-            onCameraIdle: onMapIdle,
-          ),
-          SearchComponent(network: network, searchController: searchController, moveCameraToLocation: moveCameraToLocation),
-        ],
-      ),
+      body: SlidingUpPanel(
+        renderPanelSheet: false,
+        backdropEnabled: true,
+        borderRadius: radius,
+        minHeight: 200,
+        parallaxOffset: 0.4,
+        panel: selectedLocation != null ? _floatingPanel() : Container(),
+        body: _floatingBody(),
+      ),  
       floatingActionButton: FloatingActionButton(
         child: Icon(
           Icons.location_searching,
           color: Colors.white,
         ),
-        onPressed: changeTrackingMode,
+        onPressed: () {
+          if(trackingMode == MyLocationTrackingMode.Tracking) {
+              changeTrackingMode(MyLocationTrackingMode.None);
+          } else {
+            changeTrackingMode(MyLocationTrackingMode.Tracking);
+          }
+        }
       ),
-      
-      bottomNavigationBar: SafeArea(
-        child: BottomNavigationDotBar (
-          initialPosition: 1,
-          items: <BottomNavigationDotBarItem>[
-            BottomNavigationDotBarItem(icon: Icons.favorite, onTap: () { }),
-            BottomNavigationDotBarItem(icon: Icons.map, onTap: () {  }),
-            BottomNavigationDotBarItem(icon: Icons.settings, onTap: () {  }),
-          ]
-        ),   
-      )
     );
   }
 }
