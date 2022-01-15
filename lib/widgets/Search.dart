@@ -6,6 +6,8 @@ import 'package:mcappen/components/SearchResult.dart';
 import 'package:mcappen/utils/Network.dart';
 import 'package:mcappen/utils/Styles.dart';
 import 'package:mcappen/utils/Utils.dart';
+import 'package:mcappen/views/Favorites.dart';
+import 'package:mcappen/views/Profile.dart';
 
 typedef SetSelectedLocation = Function(Location? location);
 
@@ -172,12 +174,22 @@ class _SearchState extends State<Search> {
               TextButton(
                 style: Styles().lowProfileRoundButton(!_isUserSearching),
                 child: Text("Favoritter", style: TextStyle(color: Color(0xff0D2138), fontSize: 13)),
-                onPressed: (){},
+                onPressed: (){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Favorites()),
+                  );
+                },
               ),
               TextButton(
                 style: Styles().lowProfileRoundButton(!_isUserSearching),
                 child: Text("Profil", style: TextStyle(color: Color(0xff0D2138), fontSize: 13)),
-                onPressed: (){},
+                onPressed: (){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Profile()),
+                  );
+                },
               )
             ],
           )

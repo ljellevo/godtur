@@ -15,6 +15,10 @@ class Weather {
     required this.symbolCode
   });
   
+  String getSymbolCode() {
+    return symbolCode != "" ? symbolCode : "unknown";
+  }
+  
   factory Weather.fromJson(Map<String, dynamic> json) {
     return Weather(
       time: json['time'],

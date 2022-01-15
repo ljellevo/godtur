@@ -3,6 +3,7 @@
 import 'package:mcappen/Classes/AlternativeName.dart';
 import 'package:mcappen/Classes/Coordinates.dart';
 import 'package:mcappen/Classes/Forecast.dart';
+import 'package:mcappen/Classes/Weather.dart';
 
 class LocationForecast {
   String name;
@@ -24,6 +25,39 @@ class LocationForecast {
     required this.municipality,
     required this.county,
   });
+  
+  num getCurrentAirTemperature() {
+    double timestamp = DateTime.now().millisecondsSinceEpoch / 1000;
+    for(var i = 0; i < forecast.weather.length; i++) {
+      if(forecast.weather[i].time > timestamp - 3600 && forecast.weather[i].time <= timestamp) {
+        return forecast.weather[i].airTemperature;
+      }
+    }
+    return -1;
+  }
+  
+  num getCurrentWindSpeed() {
+    double timestamp = DateTime.now().millisecondsSinceEpoch / 1000;
+    for(var i = 0; i < forecast.weather.length; i++) {
+      if(forecast.weather[i].time > timestamp - 3600 && forecast.weather[i].time <= timestamp) {
+        return forecast.weather[i].windSpeed;
+      }
+    }
+    return -1;
+  }
+  
+  List<Weather> getCurrentAndFutureWeatherForecasts() {
+    List<Weather> weather = [];
+    double timestamp = DateTime.now().millisecondsSinceEpoch / 1000;
+    for(var i = 0; i < forecast.weather.length; i++) {
+      if(forecast.weather[i].time < timestamp - 3600) {
+        continue;
+      }
+      weather.add(forecast.weather[i]);
+    }
+    return weather;
+  }
+  
   
   factory LocationForecast.fromJson(Map<String, dynamic> json) {
     return LocationForecast(

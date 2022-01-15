@@ -68,3 +68,35 @@ void onMapLoaded(MapboxMapController controller) async {
       });
     }
   }
+  
+  
+  
+            //margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
+          /*
+          child: ListView.builder(
+            itemCount: weather.length,
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (context, i) {
+              return StickyHeader(
+                overlapHeaders: true,
+                header: Text(
+                  "header",
+                  //Utils().getFormattedDatefromDate(DateTime.fromMillisecondsSinceEpoch(weather[i].time * 1000), (i + 1 < weather.length) ? DateTime.fromMillisecondsSinceEpoch(weather[i].time * 1000) : null),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey
+                  ),
+                ),
+                content: listCell(i),
+                );
+              }
+            ),
+          
+          child: ListView.builder(
+            itemCount: weather.length,
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (context, i) {
+              return 
+            }
+          ),
+          */

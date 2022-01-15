@@ -69,4 +69,54 @@ class Network {
     }
     return [];
   }
+  
+  Future<LocationForecast?> getCurrentForecastForSpecificLocation(Location location) async {
+    await validateToken();
+    print(location.coordinates[0].latitude);
+    print(location.coordinates[0].longitude);
+    // 192.168.1.146:8080/api/forecast?method=coordinate&lat=59.91187031882089&lon=10.733528334101853&access_token=RUMEUXY2NZSM5IZX_GP85A&time=-1
+    // http.Response response = await http.get(Uri.parse('http://192.168.1.146:8080/api/forecast?method=bounds&lowLat=' + lowLat + '&lowLon=' + lowLon + '&uppLat=' + uppLat + '&uppLon=' + uppLon + '&access_token=' + token!.accessToken));
+    http.Response response = await http.get(Uri.parse('http://192.168.1.146:8080/api/forecast?method=coordinate&lat=' + location.coordinates[0].latitude.toString() + '&lon=' + location.coordinates[0].longitude.toString() + '&access_token=' + token!.accessToken));
+    if(response.body != "null" && response.statusCode == 200) {
+      
+      Forecast forecast = Forecast.fromJson(json.decode(response.body));
+      LocationForecast locationForecast = LocationForecast(
+        name: location.name,
+        alternativeNames: location.alternativeNames,
+        coordinates: location.coordinates,
+        forecast: forecast,
+        importance: location.importance,
+        locationType: location.locationType,
+        municipality: location.municipality,
+        county: location.county
+      );
+      return locationForecast;
+    }
+    return null;
+  }
+  
+  Future<LocationForecast?> getAllForecastForSpecificLocation(Location location) async {
+    await validateToken();
+    print(location.coordinates[0].latitude);
+    print(location.coordinates[0].longitude);
+    // 192.168.1.146:8080/api/forecast?method=coordinate&lat=59.91187031882089&lon=10.733528334101853&access_token=RUMEUXY2NZSM5IZX_GP85A&time=-1
+    // http.Response response = await http.get(Uri.parse('http://192.168.1.146:8080/api/forecast?method=bounds&lowLat=' + lowLat + '&lowLon=' + lowLon + '&uppLat=' + uppLat + '&uppLon=' + uppLon + '&access_token=' + token!.accessToken));
+    http.Response response = await http.get(Uri.parse('http://192.168.1.146:8080/api/forecast?method=coordinate&time=-1&lat=' + location.coordinates[0].latitude.toString() + '&lon=' + location.coordinates[0].longitude.toString() + '&access_token=' + token!.accessToken));
+    if(response.body != "null" && response.statusCode == 200) {
+      
+      Forecast forecast = Forecast.fromJson(json.decode(response.body));
+      LocationForecast locationForecast = LocationForecast(
+        name: location.name,
+        alternativeNames: location.alternativeNames,
+        coordinates: location.coordinates,
+        forecast: forecast,
+        importance: location.importance,
+        locationType: location.locationType,
+        municipality: location.municipality,
+        county: location.county
+      );
+      return locationForecast;
+    }
+    return null;
+  }
 }

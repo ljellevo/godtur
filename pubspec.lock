@@ -256,6 +256,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0+1"
+  sliver_tools:
+    dependency: "direct main"
+    description:
+      name: sliver_tools
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.5"
   source_span:
     dependency: transitive
     description:
@@ -270,6 +277,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.10.0"
+  sticky_infinite_list:
+    dependency: "direct main"
+    description:
+      name: sticky_infinite_list
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.1"
   stream_channel:
     dependency: transitive
     description:
