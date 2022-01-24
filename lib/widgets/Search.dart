@@ -1,15 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:mcappen/Classes/Location.dart';
-import 'package:mcappen/components/SearchResult.dart';
 import 'package:mcappen/utils/Network.dart';
-import 'package:mcappen/utils/Styles.dart';
+import 'package:mcappen/utils/Typedefs.dart';
 import 'package:mcappen/utils/Utils.dart';
-import 'package:mcappen/views/Favorites.dart';
-import 'package:mcappen/views/Profile.dart';
+import 'package:mcappen/widgets/PlanTripUI.dart';
+import 'package:mcappen/widgets/SearchUI.dart';
 
-typedef SetSelectedLocation = Function(Location? location);
+
 
 class Search extends StatefulWidget {
   final Network network;
@@ -36,6 +34,7 @@ class _SearchState extends State<Search> {
   Location? _searchResult;
   TextEditingController searchController = TextEditingController();
   bool _isUserSearching = false;
+  bool userIsPlanning = false;
   
   @override
   void initState() {
@@ -106,161 +105,46 @@ class _SearchState extends State<Search> {
     }
   }
   
-  List<BoxShadow>? _containerBoxShadow() {
-    if(_isUserSearching){
-      return [BoxShadow(
-          color: Colors.grey.withOpacity(0.5),
-          spreadRadius: 5,
-          blurRadius: 7,
-          offset: Offset(0, 3),
-        )
-      ];
-    } 
+  void setUserIsPlanning(bool isUserPlanning) {
+    setState(() {
+      this.userIsPlanning = isUserPlanning;
+    });
+    showSearchLayover();
   }
-  
-  Widget searchBar() {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      child: Column(
-        children: [
-          CupertinoTextField(
-            focusNode: focusNode,
-            controller: searchController,
-            placeholder: "Søk etter lokasjon",
-            style: TextStyle(color: Color(0xff0D2138)),
-            prefix: _isUserSearching ? Container(
-              padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-              child: IconButton(
-                icon: Icon(Icons.chevron_left),
-                onPressed: cancelSearch
-              ),
-            ) : null,
-            suffix: Container(
-              padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-              child: IconButton(
-                icon: _suffixIcon,
-                onPressed: () {
-                  clearSearch();
-                }
-              ),
-            ),
-            padding: _isUserSearching ? EdgeInsets.fromLTRB(0, 15, 15, 15) : EdgeInsets.fromLTRB(47, 15, 15, 15),
-            decoration: BoxDecoration(
-              border: Border.all(
-                width: 1,
-                color: _isUserSearching ? Colors.grey.withOpacity(0.5) : Colors.transparent
-              ),
-              boxShadow: _isUserSearching ? null : [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 5,
-                  blurRadius: 7,
-                  offset: Offset(0, 3),
-                )
-              ],
-              borderRadius: BorderRadius.circular(30),
-              color: Colors.white,
-              
-            ),
-          ),
-          ButtonBar( 
-            alignment: MainAxisAlignment.spaceAround,
-            children: [
-              TextButton(
-                style: Styles().lowProfileRoundButton(!_isUserSearching),
-                child: Text("Planlegg", style: TextStyle(color: Color(0xff0D2138), fontSize: 13)),
-                onPressed: (){},
-              ),
-              TextButton(
-                style: Styles().lowProfileRoundButton(!_isUserSearching),
-                child: Text("Favoritter", style: TextStyle(color: Color(0xff0D2138), fontSize: 13)),
-                onPressed: (){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Favorites()),
-                  );
-                },
-              ),
-              TextButton(
-                style: Styles().lowProfileRoundButton(!_isUserSearching),
-                child: Text("Profil", style: TextStyle(color: Color(0xff0D2138), fontSize: 13)),
-                onPressed: (){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Profile()),
-                  );
-                },
-              )
-            ],
-          )
-        ],
-      )
-    );
-  }
-  
-  /*
-  SizedBox(
-              width: 100,
-                height: 25,
-                child: CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: (){},
-                  child: Text("Planlegg", style: TextStyle(color: Color(0xff0D2138), fontSize: 13)),
-                  color: Colors.white
-                )
-              ),
-              SizedBox(
-              width: 100,
-                height: 25,
-                child: CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: (){},
-                  child: Text("Favoritter", style: TextStyle(color: Color(0xff0D2138), fontSize: 13)),
-                  color: Colors.white
-                )
-              ),
-              SizedBox(
-              width: 100,
-                height: 25,
-                child: CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: (){},
-                  child: Text("Profil", style: TextStyle(color: Color(0xff0D2138), fontSize: 13)),
-                  color: Colors.white
-                )
-              ),
-  
-  */
   
   @override
   Widget build(BuildContext context) {
     _searchResult = widget.selectedLocation;
-    return Stack(
-      fit: StackFit.loose,
-      children: [
-        SearchResult(
-          network: widget.network, 
-          searchController: searchController, 
-          moveCameraToLocation: widget.moveCameraToLocation, 
-          focusNode: focusNode, 
-          showSearchResult: _isUserSearching, 
-          setSearchResult: setSearchResult
-        ),
-        Positioned(
-          left: 0,
-          top: 0,
-          right: 0,
-          child: Container(
-            decoration: BoxDecoration(
-              color: _isUserSearching ? Colors.white : Colors.transparent,
-              boxShadow: _containerBoxShadow()
-            ),
-            padding: EdgeInsets.fromLTRB(15, 50, 15, 0),
-            child: searchBar()
-          )
-        ),
-      ],
-    );
+    if(userIsPlanning) {
+      return PlanTripUI(
+        isUserSearching: _isUserSearching,
+        focusNode: focusNode,
+        searchController: searchController,
+        network: widget.network,
+        cancelSearch: cancelSearch,
+        clearSearch: clearSearch,
+        setSearchResult: setSearchResult,
+        suffixIcon: _suffixIcon,
+        moveCameraToLocation: widget.moveCameraToLocation,
+        setUserIsPlanning: setUserIsPlanning,
+        userIsPlanning: userIsPlanning,
+      );
+    } else {
+      return SearchUI(
+        isUserSearching: _isUserSearching,
+        focusNode: focusNode,
+        searchController: searchController,
+        network: widget.network,
+        cancelSearch: cancelSearch,
+        clearSearch: clearSearch,
+        setSearchResult: setSearchResult,
+        suffixIcon: _suffixIcon,
+        moveCameraToLocation: widget.moveCameraToLocation,
+        setUserIsPlanning: setUserIsPlanning,
+        userIsPlanning: userIsPlanning,
+      );
+    }
+    
   }
 }
 

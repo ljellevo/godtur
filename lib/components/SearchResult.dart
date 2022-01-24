@@ -2,10 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mcappen/Classes/Location.dart';
 import 'package:mcappen/utils/Network.dart';
+import 'package:mcappen/utils/Typedefs.dart';
 
 
-typedef LocationCallback = Function(Location location);
-typedef SetSearchResultCallback = Function(Location? location);
+
 
 class SearchResult extends StatefulWidget {
   final Network network;
@@ -50,6 +50,8 @@ class _SearchResultState extends State<SearchResult> {
   void searchFieldChanged() async {
     if(widget.searchController.value.text != "") {
       locations = await widget.network.getLocationBySearch(widget.searchController.value.text);
+    } else {
+      locations = [];
     }
     setState(() {
       locations = locations;
@@ -58,11 +60,11 @@ class _SearchResultState extends State<SearchResult> {
   
   Widget searchResultList() {
     if(widget.showSearchResult) {
-      return Positioned.fill(
-        top: 130,
+      return Expanded(
         child: Container(
           color: Colors.white,
           child: ListView.builder(
+            padding: EdgeInsets.zero,
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             itemCount: locations.length,
             itemBuilder: (BuildContext context, int i) {

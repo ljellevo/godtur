@@ -1,102 +1,39 @@
-
-  Future<LatLng?> _acquireCurrentLocation() async {
-    Location location = new Location();
-
-    bool serviceEnabled;
-    PermissionStatus permissionGranted;
-    LocationData locationData;
-
-    serviceEnabled = await location.serviceEnabled();
-      if (!serviceEnabled) {
-        serviceEnabled = await location.requestService();
-        if (!serviceEnabled) {
-          return null;
-        }
-      }
-
-    permissionGranted = await location.hasPermission();
-    if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await location.requestPermission();
-      if (permissionGranted != PermissionStatus.granted) {
-        return null;
-      }
-    }
-
-    locationData = await location.getLocation();
-    return LatLng(locationData.latitude!, locationData.longitude!);
-}
-
-
-
-
-
-
-
-void onMapLoaded(MapboxMapController controller) async {
-      try {
-        var loc = await controller.requestMyLocationLatLng();
-        LocationData locationData = await new Location().getLocation();
-        if(locationData.latitude != null && locationData.longitude != null) {
-          moveCamera(
-            controller: controller, 
-            location: LatLng(locationData.latitude!, locationData.longitude!)
-          );
-        }
-      } catch (e) {
-        print("Could not get location");
-      }
-    }
-    
-    
-  void determineBackground(List<Symbol>? mark, double zoom) {
-    if(zoom < 11) {
-      setState(() {
-        //mapColor = Color(0xFFFFE306).withOpacity(0.3);
-        mapColor = Colors.transparent;
-        if(mark != null && !mapHasMarker) {
-          markers = widget.mapController.addSymbols(weatherMarkers);
-          mapHasMarker = true;
-        }
-      });
-    } else {
-      setState(() {
-        mapColor = Colors.blue.withOpacity(0.3);
-        if(mark != null && mapHasMarker) {
-          widget.mapController.removeSymbols(mark);
-          mapHasMarker = false;
-        }
-      });
-    }
-  }
-  
-  
-  
-            //margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
-          /*
-          child: ListView.builder(
-            itemCount: weather.length,
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (context, i) {
-              return StickyHeader(
-                overlapHeaders: true,
-                header: Text(
-                  "header",
-                  //Utils().getFormattedDatefromDate(DateTime.fromMillisecondsSinceEpoch(weather[i].time * 1000), (i + 1 < weather.length) ? DateTime.fromMillisecondsSinceEpoch(weather[i].time * 1000) : null),
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey
+Card(
+            margin: EdgeInsets.all(20),
+            child: Padding(
+              padding: EdgeInsets.only(left: 40, top: 0, bottom: 0),
+              child: FixedTimeline.tileBuilder(
+                mainAxisSize: MainAxisSize.min,
+                theme: timelineTheme(),
+                builder: TimelineTileBuilder.connectedFromStyle(
+                  contentsAlign: ContentsAlign.basic,
+                  contentsBuilder: (context, index) => Container(
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      margin: const EdgeInsets.only(bottom: 40, top: 40),
+                      child: Text(searchFields[index].value.text)
                   ),
+                  firstConnectorStyle: ConnectorStyle.transparent,
+                  lastConnectorStyle: ConnectorStyle.transparent,
+                  connectorStyleBuilder: (context, index) => ConnectorStyle.solidLine,
+                  indicatorStyleBuilder: (context, index) => IndicatorStyle.dot,
+                  itemCount: searchFields.length,
                 ),
-                content: listCell(i),
-                );
-              }
-            ),
+              ),
+            )
+          )
           
-          child: ListView.builder(
-            itemCount: weather.length,
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (context, i) {
-              return 
-            }
-          ),
-          */
+          
+          
+          
+  TimelineThemeData timelineTheme() {
+    return TimelineThemeData(
+      nodeItemOverlap: true,
+      nodePosition: 0,
+      indicatorTheme: IndicatorThemeData(
+        size: 20
+      ),
+      connectorTheme: ConnectorThemeData(
+        thickness: 4
+      )
+    );
+  }

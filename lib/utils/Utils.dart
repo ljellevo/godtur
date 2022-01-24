@@ -14,6 +14,14 @@ class Utils {
     );
   }
   
+  bool isWithinCurrentHour(Weather weather) {
+    double timestamp = DateTime.now().millisecondsSinceEpoch / 1000;
+    if(weather.time > timestamp - 3600 && weather.time <= timestamp) {
+      return true;
+    }
+    return false;
+  }
+  
   
   String getFormattedDatefromDate(DateTime date) {
     String day = date.day.toString();
@@ -84,5 +92,19 @@ class Utils {
     minute = minute.length == 2 ? minute : "0" + minute;
     
     return hour.toString() + ":" + minute.toString();
+  }
+  
+  String getFormattedTimeRangefromDate(DateTime date) {
+    int nextH = -1;
+    if(date.hour + 1 == 24) {
+      nextH = 0;
+    } else {
+      nextH = date.hour + 1;
+    }
+    
+    String hour = date.hour.toString().length == 2 ? date.hour.toString() : "0" + date.hour.toString();
+    String nextHour = nextH.toString().length == 2 ? nextH.toString() : "0" + nextH.toString();
+    
+    return hour.toString() + "-" + nextHour.toString();
   }
 }
