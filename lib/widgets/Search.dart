@@ -4,22 +4,38 @@ import 'package:mcappen/Classes/Location.dart';
 import 'package:mcappen/utils/Network.dart';
 import 'package:mcappen/utils/Typedefs.dart';
 import 'package:mcappen/utils/Utils.dart';
+import 'package:mcappen/widgets/PlanTrip.dart';
 import 'package:mcappen/widgets/PlanTripUI.dart';
 import 'package:mcappen/widgets/SearchUI.dart';
 
 
 
 class Search extends StatefulWidget {
-  final Network network;
-  final LocationCallback moveCameraToLocation;
   final SetSelectedLocation setSelectedLocation;
-  final Location? selectedLocation;
+  final bool isUserSearching;
+  final Network network;
+  final Function cancelSearch;
+  final Function clearSearch;
+  final SetSearchResultCallback setSearchResult;
+  final Icon suffixIcon;
+  final LocationCallback moveCameraToLocation;
+  final SetUserIsPlanning setUserIsPlanning;
+  final Function showSearchLayover;
+  final Function hideSearchLayover;
+  
   Search({
-    required this.network,
-    required this.moveCameraToLocation,
     required this.setSelectedLocation,
-    required this.selectedLocation,
-    Key? key
+    required this.isUserSearching,
+    required this.network,
+    required this.cancelSearch,
+    required this.clearSearch,
+    required this.setSearchResult,
+    required this.suffixIcon,
+    required this.moveCameraToLocation,
+    required this.setUserIsPlanning,
+    required this.showSearchLayover,
+    required this.hideSearchLayover,
+    Key? key, 
   }) : super(key: key);
 
   @override
@@ -33,8 +49,6 @@ class _SearchState extends State<Search> {
   final focusNode = FocusNode();
   Location? _searchResult;
   TextEditingController searchController = TextEditingController();
-  bool _isUserSearching = false;
-  bool userIsPlanning = false;
   
   @override
   void initState() {
@@ -76,75 +90,48 @@ class _SearchState extends State<Search> {
   /// This function tells the search component to hide the layover view as well as dismisses any potential keyboard.
   void cancelSearch() {
     focusNode.unfocus();
-    hideSearchLayover();
+    widget.cancelSearch();
   }
   
   void showSearchLayover() {
-    setState(() {
-      _isUserSearching = true;
-    });
+    widget.showSearchLayover();
   }
   
   void hideSearchLayover() {
-    setState(() {
-      _isUserSearching = false;
-    });
+    widget.hideSearchLayover();
   }
   
   /// Sets selected search result and navigates map if location is not null.
   void setSearchResult(Location? location) {
-    widget.setSelectedLocation(location);
     setState(() {
       _searchResult = location;
       new Utils().setTextInTextField(searchController, _searchResult != null ? _searchResult!.name : "");
-      _isUserSearching = false;
     });
     if(_searchResult != null) {
       focusNode.unfocus();
       widget.moveCameraToLocation(_searchResult!);
     }
+    widget.setSearchResult(location);
   }
   
   void setUserIsPlanning(bool isUserPlanning) {
-    setState(() {
-      this.userIsPlanning = isUserPlanning;
-    });
-    showSearchLayover();
+    widget.setUserIsPlanning(isUserPlanning);
   }
   
   @override
   Widget build(BuildContext context) {
-    _searchResult = widget.selectedLocation;
-    if(userIsPlanning) {
-      return PlanTripUI(
-        isUserSearching: _isUserSearching,
-        focusNode: focusNode,
-        searchController: searchController,
-        network: widget.network,
-        cancelSearch: cancelSearch,
-        clearSearch: clearSearch,
-        setSearchResult: setSearchResult,
-        suffixIcon: _suffixIcon,
-        moveCameraToLocation: widget.moveCameraToLocation,
-        setUserIsPlanning: setUserIsPlanning,
-        userIsPlanning: userIsPlanning,
-      );
-    } else {
-      return SearchUI(
-        isUserSearching: _isUserSearching,
-        focusNode: focusNode,
-        searchController: searchController,
-        network: widget.network,
-        cancelSearch: cancelSearch,
-        clearSearch: clearSearch,
-        setSearchResult: setSearchResult,
-        suffixIcon: _suffixIcon,
-        moveCameraToLocation: widget.moveCameraToLocation,
-        setUserIsPlanning: setUserIsPlanning,
-        userIsPlanning: userIsPlanning,
-      );
-    }
-    
+    return SearchUI(
+      isUserSearching: widget.isUserSearching,
+      focusNode: focusNode,
+      searchController: searchController,
+      network: widget.network,
+      cancelSearch: cancelSearch,
+      clearSearch: clearSearch,
+      setSearchResult: setSearchResult,
+      suffixIcon: _suffixIcon,
+      moveCameraToLocation: widget.moveCameraToLocation,
+      setUserIsPlanning: setUserIsPlanning,
+    );
   }
 }
 

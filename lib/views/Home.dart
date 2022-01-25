@@ -10,6 +10,7 @@ import 'package:mcappen/components/FloatingPanel.dart';
 import 'package:mcappen/utils/CameraManager.dart';
 import 'package:mcappen/utils/LocationManager.dart';
 import 'package:mcappen/utils/Network.dart';
+import 'package:mcappen/widgets/Finder.dart';
 import 'package:mcappen/widgets/Search.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
@@ -115,7 +116,7 @@ class _HomePageState extends State<HomePage> {
           trackCameraPosition: true,
           onCameraIdle: onMapIdle,
         ),
-        Search(
+        Finder(
           network: network, 
           moveCameraToLocation: moveCameraToLocation,
           setSelectedLocation: setSelectedLocation,

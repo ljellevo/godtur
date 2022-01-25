@@ -130,7 +130,7 @@ class _FloatingPanelState extends State<FloatingPanel> {
               ),
             ),
             ForecastList(
-              selectedLocation: widget.selectedLocation,
+              selectedLocation: widget.selectedLocation!,
               locationForecast: widget.locationForecast,
             ),
             Container(

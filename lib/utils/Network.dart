@@ -44,15 +44,21 @@ class Network {
   
   Future<List<Location>> getLocationBySearch(String searchValue) async {
     await validateToken();
-    http.Response response = await http.get(Uri.parse('http://192.168.1.146:8080/api/locations/search?name=' + searchValue + '&access_token=' + token!.accessToken));
-    if(response.statusCode == 200) {
-      if(response.body != "null") {
-        Iterable locationResponse  = json.decode(response.body) as Iterable;
-        List<Location> locations = List<Location>.from(locationResponse.map<Location>((dynamic i) => Location.fromJson(i as Map<String, dynamic>)));
-        return locations;
+    try {
+      print("Search");
+      http.Response response = await http.get(Uri.parse('http://192.168.1.146:8080/api/locations/search?name=' + searchValue + '&access_token=' + token!.accessToken));
+      if(response.statusCode == 200) {
+        if(response.body != "null") {
+          Iterable locationResponse  = json.decode(response.body) as Iterable;
+          List<Location> locations = List<Location>.from(locationResponse.map<Location>((dynamic i) => Location.fromJson(i as Map<String, dynamic>)));
+          return locations;
+        }
       }
+      return [];
+    } catch (e){
+      print(e);
+      return [];
     }
-    return [];
   }
   
   Future<List<LocationForecast>> getForecastsWithinViewportBounds(LatLngBounds bounds) async {

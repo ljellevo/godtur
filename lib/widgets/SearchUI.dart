@@ -21,7 +21,6 @@ class SearchUI extends StatefulWidget {
   final Icon suffixIcon;
   final LocationCallback moveCameraToLocation;
   final SetUserIsPlanning setUserIsPlanning;
-  final bool userIsPlanning;
 
   
   SearchUI({
@@ -35,7 +34,6 @@ class SearchUI extends StatefulWidget {
     required this.suffixIcon,
     required this.moveCameraToLocation,
     required this.setUserIsPlanning,
-    required this.userIsPlanning,
     Key? key
   }) : super(key: key);
 
@@ -46,6 +44,12 @@ class SearchUI extends StatefulWidget {
 }
 
 class _SearchUIState extends State<SearchUI> {
+  
+  @override
+  void dispose() {
+    print("Disposing of SearchUI");
+    super.dispose();
+  }
   
   List<BoxShadow>? _containerBoxShadow() {
     if(widget.isUserSearching){
@@ -59,8 +63,10 @@ class _SearchUIState extends State<SearchUI> {
     } 
   }
   
+  // margin: EdgeInsets.only(top: 0, bottom: 10),
   Widget searchBar() {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         widget.isUserSearching ? Container(
           child: IconButton(
@@ -73,45 +79,49 @@ class _SearchUIState extends State<SearchUI> {
         ) : Container(),
         Flexible(
           fit: FlexFit.loose,
-          child: CupertinoTextField(
-            focusNode: widget.focusNode,
-            controller: widget.searchController,
-            placeholder: "Søk etter lokasjon",
-            style: TextStyle(color: Color(0xff0D2138)),
-            prefix: Container(
-              padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-              child: IconButton(
-                icon: Icon(Icons.search),
-                onPressed: () {}
+          child: Container(
+            padding: EdgeInsets.only(top: 5, bottom: 5),
+            child: CupertinoTextField(
+              
+              focusNode: widget.focusNode,
+              controller: widget.searchController,
+              placeholder: "Søk etter lokasjon",
+              style: TextStyle(color: Color(0xff0D2138)),
+              prefix: Container(
+                padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                child: IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () {}
+                ),
+              ),
+              suffix: widget.searchController.value.text != "" ? Container(
+                padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                child: IconButton(
+                  icon: Icon(Icons.cancel),
+                  onPressed: () {
+                    widget.clearSearch();
+                  }
+                ),
+              ): null,
+              padding: EdgeInsets.fromLTRB(0, 5, 15, 5),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  width: 2,
+                  color: widget.isUserSearching ? Color(0xff0D2138) : Colors.transparent
+                ),
+                boxShadow: widget.isUserSearching ? null : [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
+                  )
+                ],
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.white,
               ),
             ),
-            suffix: widget.searchController.value.text != "" ? Container(
-              padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-              child: IconButton(
-                icon: Icon(Icons.cancel),
-                onPressed: () {
-                  widget.clearSearch();
-                }
-              ),
-            ): null,
-            padding: EdgeInsets.fromLTRB(0, 15, 15, 15),
-            decoration: BoxDecoration(
-              border: Border.all(
-                width: 2,
-                color: widget.isUserSearching ? Color(0xff0D2138) : Colors.transparent
-              ),
-              boxShadow: widget.isUserSearching ? null : [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 5,
-                  blurRadius: 7,
-                  offset: Offset(0, 3),
-                )
-              ],
-              borderRadius: BorderRadius.circular(10),
-              color: Colors.white,
-            ),
-          ),
+          )
         )
       ],
     );
@@ -184,7 +194,7 @@ class _SearchUIState extends State<SearchUI> {
             mainAxisSize: MainAxisSize.min,
             children: [
               searchBar(),
-              buttonBar()
+              widget.isUserSearching ? buttonBar() : Container()
             ],
           ),
         ),

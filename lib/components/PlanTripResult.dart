@@ -7,14 +7,14 @@ import 'package:mcappen/utils/Typedefs.dart';
 
 
 
-class SearchResult extends StatefulWidget {
+class PlanTripResult extends StatefulWidget {
   final Network network;
   final TextEditingController searchController;
   final LocationCallback moveCameraToLocation;
   final FocusNode focusNode;
   final bool showSearchResult;
-  final SetSearchResultCallback setSearchResult;
-  SearchResult({
+  final SetPlanningSearchResultCallback setSearchResult;
+  PlanTripResult({
     required this.network,
     required this.searchController,
     required this.moveCameraToLocation,
@@ -27,21 +27,22 @@ class SearchResult extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _SearchResultState();
+    return _PlanTripResultState();
   }
 }
 
-class _SearchResultState extends State<SearchResult> {
+class _PlanTripResultState extends State<PlanTripResult> {
   List<Location> locations = [];
   
   @override
   void initState() {
     super.initState();
-    widget.searchController.addListener(searchFieldChanged);
+    
   }
   
   @override
   void dispose() {
+    widget.searchController.removeListener(searchFieldChanged);
     super.dispose();
   }
   
@@ -71,7 +72,7 @@ class _SearchResultState extends State<SearchResult> {
               return GestureDetector(
                 child: listCell(i),
                 onTap: () {
-                  widget.setSearchResult(locations[i]);
+                  //widget.setSearchResult(locations[i], i);
                 }
               );
             }
@@ -153,6 +154,7 @@ class _SearchResultState extends State<SearchResult> {
   
   @override
   Widget build(BuildContext context) {
+    //widget.searchController.addListener(searchFieldChanged);
     return searchResultList();
   }
 }
