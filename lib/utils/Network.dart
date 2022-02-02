@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:mcappen/Classes/Coordinates.dart';
 import 'package:mcappen/Classes/Forecast.dart';
 import 'package:mcappen/Classes/Location.dart';
 import 'package:mcappen/Classes/LocationForecast.dart';
@@ -45,7 +46,6 @@ class Network {
   Future<List<Location>> getLocationBySearch(String searchValue) async {
     await validateToken();
     try {
-      print("Search");
       http.Response response = await http.get(Uri.parse('http://192.168.1.146:8080/api/locations/search?name=' + searchValue + '&access_token=' + token!.accessToken));
       if(response.statusCode == 200) {
         if(response.body != "null") {
@@ -95,6 +95,28 @@ class Network {
         locationType: location.locationType,
         municipality: location.municipality,
         county: location.county
+      );
+      return locationForecast;
+    }
+    return null;
+  }
+  
+  Future<LocationForecast?> getAllForecastForSpecificCoordinates(LatLng location) async {
+    await validateToken();
+    // 192.168.1.146:8080/api/forecast?method=coordinate&lat=59.91187031882089&lon=10.733528334101853&access_token=RUMEUXY2NZSM5IZX_GP85A&time=-1
+    // http.Response response = await http.get(Uri.parse('http://192.168.1.146:8080/api/forecast?method=bounds&lowLat=' + lowLat + '&lowLon=' + lowLon + '&uppLat=' + uppLat + '&uppLon=' + uppLon + '&access_token=' + token!.accessToken));
+    http.Response response = await http.get(Uri.parse('http://192.168.1.146:8080/api/forecast?method=coordinate&time=-1&lat=' + location.latitude.toString() + '&lon=' + location.longitude.toString() + '&access_token=' + token!.accessToken));
+    if(response.body != "null" && response.statusCode == 200) {
+      Forecast forecast = Forecast.fromJson(json.decode(response.body));
+      LocationForecast locationForecast = LocationForecast(
+        name: "Min lokasjon",
+        alternativeNames: [],
+        coordinates: [Coordinates(latitude: location.latitude, longitude: location.longitude)],
+        forecast: forecast,
+        importance: 10,
+        locationType: "Not implemented",
+        municipality: "Not implemented",
+        county: "Not implemented"
       );
       return locationForecast;
     }

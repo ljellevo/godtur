@@ -1,39 +1,14 @@
-Card(
-            margin: EdgeInsets.all(20),
-            child: Padding(
-              padding: EdgeInsets.only(left: 40, top: 0, bottom: 0),
-              child: FixedTimeline.tileBuilder(
-                mainAxisSize: MainAxisSize.min,
-                theme: timelineTheme(),
-                builder: TimelineTileBuilder.connectedFromStyle(
-                  contentsAlign: ContentsAlign.basic,
-                  contentsBuilder: (context, index) => Container(
-                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                      margin: const EdgeInsets.only(bottom: 40, top: 40),
-                      child: Text(searchFields[index].value.text)
-                  ),
-                  firstConnectorStyle: ConnectorStyle.transparent,
-                  lastConnectorStyle: ConnectorStyle.transparent,
-                  connectorStyleBuilder: (context, index) => ConnectorStyle.solidLine,
-                  indicatorStyleBuilder: (context, index) => IndicatorStyle.dot,
-                  itemCount: searchFields.length,
-                ),
-              ),
-            )
-          )
-          
-          
-          
-          
-  TimelineThemeData timelineTheme() {
-    return TimelineThemeData(
-      nodeItemOverlap: true,
-      nodePosition: 0,
-      indicatorTheme: IndicatorThemeData(
-        size: 20
-      ),
-      connectorTheme: ConnectorThemeData(
-        thickness: 4
-      )
-    );
-  }
+59.91
+10.74
+
+
+60.16
+10.25
+
+
+
+https://api.mapbox.com/directions/v5/mapbox/walking/10.74,59.91;10.38,60.09?access_token=pk.eyJ1IjoibGplbGxldm8iLCJhIjoiY2t2cXk2cW56MDJucDJ3bTlpeDN6N3RsciJ9.v7yGkVXVpQR0nqpdTZI_dg
+
+
+54.458674
+12.551446

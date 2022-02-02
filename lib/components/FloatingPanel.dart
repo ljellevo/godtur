@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:mcappen/Classes/Location.dart';
 import 'package:mcappen/Classes/LocationForecast.dart';
 import 'package:mcappen/components/ForecastList.dart';
@@ -36,9 +37,11 @@ class _FloatingPanelState extends State<FloatingPanel> {
           borderRadius: BorderRadius.all(Radius.circular(24.0)),
           boxShadow: [
             BoxShadow(
-              blurRadius: 20.0,
-              color: Colors.grey,
-            ),
+              color: Colors.black.withOpacity(0.3),
+              spreadRadius: 2,
+              blurRadius: 7,
+              offset: Offset(0, 3),
+            )
           ]
         ),
         margin: const EdgeInsets.all(24.0),

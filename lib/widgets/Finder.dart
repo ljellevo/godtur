@@ -1,13 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mcappen/Classes/Location.dart';
+import 'package:mcappen/Stateless/SearchInputField.dart';
 import 'package:mcappen/utils/Network.dart';
 import 'package:mcappen/utils/Typedefs.dart';
 import 'package:mcappen/utils/Utils.dart';
-import 'package:mcappen/widgets/PlanTrip.dart';
-import 'package:mcappen/widgets/PlanTripUI.dart';
 import 'package:mcappen/widgets/Search.dart';
-import 'package:mcappen/widgets/SearchUI.dart';
 
 
 
@@ -31,85 +29,61 @@ class Finder extends StatefulWidget {
 }
 
 class _FinderState extends State<Finder> {
-  Icon _suffixIcon = Icon(Icons.search);
-  Location? _searchResult;
-  bool _isUserSearching = false;
+  TextEditingController selectedLocationTextController = TextEditingController();
   
-  
-  /// onPress Functionality for the search/cancel icon button on the right hand side.
   void clearSearch() {
     setSearchResult(null);
-    showSearchLayover();
   }
-  
-  /// onPress Functionality for the "chevron" button on the left hand side. 
-  /// This function tells the search component to hide the layover view as well as dismisses any potential keyboard.
-  void cancelSearch() {
-    hideSearchLayover();
-  }
-  
-  void showSearchLayover() {
-    setState(() {
-      _isUserSearching = true;
-    });
-  }
-  
-  void hideSearchLayover() {
-    setState(() {
-      _isUserSearching = false;
-    });    
-  }
-  
-
   
   /// Sets selected search result and navigates map if location is not null.
   void setSearchResult(Location? location) {
+    setState(() {
+      selectedLocationTextController.text = location != null ? location.name : "";
+      new Utils().setTextInTextField(selectedLocationTextController, location != null ? location.name : "");
+    });
     widget.setSelectedLocation(location);
-    hideSearchLayover();
-    if(_searchResult != null) {
-      widget.moveCameraToLocation(_searchResult!);
+    if(location != null) {
+      widget.moveCameraToLocation(location);
     }
   }
   
-  void setUserIsPlanning(bool isUserPlanning) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => PlanTrip(
-        setSelectedLocation: widget.setSelectedLocation,
-        isUserSearching: _isUserSearching,
-        network: widget.network,
-        cancelSearch: cancelSearch,
-        clearSearch: clearSearch,
-        setSearchResult: setSearchResult,
-        suffixIcon: _suffixIcon,
-        moveCameraToLocation: widget.moveCameraToLocation,
-        setUserIsPlanning: setUserIsPlanning,
-        showSearchLayover: showSearchLayover,
-        hideSearchLayover: hideSearchLayover,
-        selectedLocation: widget.selectedLocation,
-      )
-    ),
-  );
+  void navigateToSearch() {
+    Navigator.push(
+      context, 
+      MaterialPageRoute(
+        builder: (context) => Search(
+          network: widget.network,
+          setSearchResult: setSearchResult,
+          selectedLocationSearchController: selectedLocationTextController,
+        )
+      ),
+    );
   }
   
   @override
   Widget build(BuildContext context) {
-    _searchResult = widget.selectedLocation;
-    return Search(
-      setSelectedLocation: widget.setSelectedLocation,
-      isUserSearching: _isUserSearching,
-      network: widget.network,
-      cancelSearch: cancelSearch,
-      clearSearch: clearSearch,
-      setSearchResult: setSearchResult,
-      suffixIcon: _suffixIcon,
-      moveCameraToLocation: widget.moveCameraToLocation,
-      setUserIsPlanning: setUserIsPlanning,
-      showSearchLayover: showSearchLayover,
-      hideSearchLayover: hideSearchLayover,
+    return Positioned(
+      top: 30,
+      left: 20,
+      right: 20,
+      height: 100,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SearchInputField(
+            focus: FocusNode(), 
+            controller: selectedLocationTextController, 
+            placeholder: "Søk etter lokasjon",
+            readOnly: true,
+            actAsButton: true,
+            clearSearch: clearSearch,
+            onTap: navigateToSearch,
+          )
+        ],
+      ),
     );
   }
 }
-
-
 
 
 

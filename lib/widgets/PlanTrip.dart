@@ -1,41 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:mcappen/Classes/Location.dart';
-import 'package:mcappen/Classes/TextControllerFocus.dart';
+import 'package:mcappen/Classes/LocationForecast.dart';
 import 'package:mcappen/utils/Network.dart';
-import 'package:mcappen/utils/Typedefs.dart';
-import 'package:mcappen/utils/Utils.dart';
 import 'package:mcappen/widgets/PlanTripUI.dart';
+import 'package:mcappen/widgets/Search.dart';
 
 
 
 class PlanTrip extends StatefulWidget {
-  final SetSelectedLocation setSelectedLocation;
-  final bool isUserSearching;
   final Network network;
-  final Function cancelSearch;
-  final Function clearSearch;
-  final SetSearchResultCallback setSearchResult;
-  final Icon suffixIcon;
-  final LocationCallback moveCameraToLocation;
-  final SetUserIsPlanning setUserIsPlanning;
-  final Function showSearchLayover;
-  final Function hideSearchLayover;
   final Location? selectedLocation;
+  final UserLocation? userLocation;
 
   PlanTrip({
-    required this.setSelectedLocation,
-    required this.isUserSearching,
     required this.network,
-    required this.cancelSearch,
-    required this.clearSearch,
-    required this.setSearchResult,
-    required this.suffixIcon,
-    required this.moveCameraToLocation,
-    required this.setUserIsPlanning,
-    required this.showSearchLayover,
-    required this.hideSearchLayover,
     required this.selectedLocation,
+    required this.userLocation,
     Key? key
   }) : super(key: key);
 
@@ -45,104 +27,157 @@ class PlanTrip extends StatefulWidget {
   }
 }
 
+enum TraficType {  
+   Driving,
+   Walking,
+   Cycling,
+}
+
 class _PlanTripState extends State<PlanTrip> {
-  Icon _suffixIcon = Icon(Icons.search);
-  TextControllerFocus? activeController;
-  List<TextControllerFocus> searchControllers = [];
-  bool userIsPlanning = false;
+  List<TextEditingController> searchControllers = [];
+  List<LocationForecast> forecasts = [];
+  TraficType traficType = TraficType.Driving;
   
   @override
   void initState() {
     super.initState();
-    searchControllers.add(createController("Min posisjon"));
+    TextEditingController myLocation = new TextEditingController();
+    myLocation.text = "Min lokasjon";
+    searchControllers.add(myLocation);
+    getCurrentLocationForecast();
+    TextEditingController destination = new TextEditingController();
     if(widget.selectedLocation != null) {
-      searchControllers.add(createController(widget.selectedLocation!.name));
-    } else {
-      searchControllers.add(createController(null));
+      destination.text = widget.selectedLocation!.name;
+      getLocationForecast(widget.selectedLocation!);
     }
-    activeController = searchControllers[searchControllers.length - 1];
-    
-    
+    searchControllers.add(destination);
   }
   
   @override
   void dispose() {
-    for(var searchController in searchControllers) {
-      searchController.getController().dispose();
-      searchController.getFocus().dispose();
-    }
     super.dispose();
   }
   
-  TextControllerFocus createController(String? text) {
-    TextEditingController myLocation = new TextEditingController();
-    myLocation.text = text != null ? text : "";
-    
-    FocusNode focus = new FocusNode();
-    focus.addListener(textEntryFieldFocusChanged);
-    return TextControllerFocus(controller: myLocation, focus: focus);
+  void onFieldTap(int i) {    
+    Navigator.push(
+      context, 
+      MaterialPageRoute(
+        builder: (context) => Search(
+          network: widget.network,
+          setSearchResult: (Location? location) {
+            setSearchResult(location, i);
+          },
+          selectedLocationSearchController: searchControllers[i],
+          textChanged: textChanged,
+        )
+      ),
+    );
   }
   
-  void textEntryFieldFocusChanged() {
-    print("Focus changed");
-    for(var controller in searchControllers) {
-      if(controller.getFocus().hasFocus) {
-        setState(() {
-          activeController = controller;
-        });
+  void navigateBack() {
+    Navigator.pop(context);
+  }
+  
+  void textChanged() {
+    setState(() {});
+  }
+  
+  void clearField(int i) {
+    setState(() {
+      searchControllers[i].clear();
+    });
+  }
+  
+  void addDestination() {
+    if(searchControllers[searchControllers.length - 1].value.text != "") {
+      setState(() {
+        searchControllers.add(TextEditingController());
+      });
+    }
+  }
+  
+  void removeDestination(int i) {
+    setState(() {
+      if(forecasts.length < i) {
+        forecasts.removeAt(i);
+      }
+      searchControllers.removeAt(i);
+      sortForecasts();
+    });
+  }
+  
+  void reorderControllers(int oldIndex, int newIndex) {
+    final TextEditingController item = searchControllers.removeAt(oldIndex);
+    setState(() {
+      searchControllers.insert(newIndex, item);
+    });
+    sortForecasts();
+  }
+  
+  void setSearchResult(Location? location, int i) {
+    setState(() {
+      if(location != null){
+        searchControllers[i].text = location.name;
+        getLocationForecast(location);
+      } else {
+        searchControllers[i].text = "";
+      }
+    });
+  }
+  
+  void getCurrentLocationForecast() async {
+    if(widget.userLocation != null) {
+      LocationForecast? forecast = await widget.network.getAllForecastForSpecificCoordinates(widget.userLocation!.position);
+      if(forecast != null) {
+        forecasts.add(forecast);
+        sortForecasts();
       }
     }
   }
   
-  
-  /// onPress Functionality for the search/cancel icon button on the right hand side.
-  void clearSearch(i) {
-    searchControllers[i].getController().clear();
-    setSearchResult(null, i);
+  void getLocationForecast(Location location) async {
+    LocationForecast? forecast = await widget.network.getAllForecastForSpecificLocation(location);
+    if(forecast != null) {
+      forecasts.add(forecast);
+      sortForecasts();
+    }
   }
   
-  /// onPress Functionality for the "chevron" button on the left hand side. 
-  /// This function tells the search component to hide the layover view as well as dismisses any potential keyboard.
-  void cancelSearch() {
-    widget.cancelSearch();
-    Navigator.pop(context);
-  }
-
-  
-  void addController() {
+  void sortForecasts() {
+    List<LocationForecast> sorted = [];
+    for(var controller in searchControllers) {
+      for(var forecast in forecasts) {
+        if(controller.text == forecast.name){
+          sorted.add(forecast);
+        }
+      }
+    }                     
     setState(() {
-      searchControllers.add(createController(null));
+      forecasts = sorted;
     });
   }
   
-  void removeController(int i) {
+  void changeTraficType(TraficType newType) {
     setState(() {
-      searchControllers.removeAt(i);
+      traficType = newType;
     });
-  }
-  
-  ///
-  void setSearchResult(Location? location, int index) {
-    searchControllers[index].getController().text = location != null ? location.name : "";
-    searchControllers[index].setLocation(location);
   }
   
   @override
   Widget build(BuildContext context) {
-    FocusScope.of(context).requestFocus(activeController!.getFocus());
     return Material(
       child: PlanTripUI(
-        isUserSearching: widget.isUserSearching,
-        activeController: activeController!,
         searchControllers: searchControllers,
+        forecasts: forecasts,
         network: widget.network,
-        cancelSearch: cancelSearch,
-        clearSearch: clearSearch,
-        addController: addController,
-        removeController: removeController,
-        setSearchResult: setSearchResult,
-        suffixIcon: _suffixIcon,
-        moveCameraToLocation: widget.moveCameraToLocation,
+        addDestination: addDestination,
+        removeDestination: removeDestination,
+        onFieldTap: onFieldTap,
+        clearField: clearField,
+        navigateBack: navigateBack,
+        reorderControllers: reorderControllers,
+        traficType: traficType,
+        changeTraficType: changeTraficType,
       ),
     );
   }

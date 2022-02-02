@@ -10,16 +10,13 @@ import 'package:mcappen/utils/Typedefs.dart';
 class SearchResult extends StatefulWidget {
   final Network network;
   final TextEditingController searchController;
-  final LocationCallback moveCameraToLocation;
   final FocusNode focusNode;
-  final bool showSearchResult;
   final SetSearchResultCallback setSearchResult;
+  
   SearchResult({
     required this.network,
     required this.searchController,
-    required this.moveCameraToLocation,
     required this.focusNode,
-    required this.showSearchResult,
     required this.setSearchResult,
   Key? key
   }) : super(key: key);
@@ -42,6 +39,7 @@ class _SearchResultState extends State<SearchResult> {
   
   @override
   void dispose() {
+    widget.searchController.removeListener(searchFieldChanged);
     super.dispose();
   }
   
@@ -59,28 +57,26 @@ class _SearchResultState extends State<SearchResult> {
   }
   
   Widget searchResultList() {
-    if(widget.showSearchResult) {
-      return Expanded(
-        child: Container(
-          color: Colors.white,
-          child: ListView.builder(
-            padding: EdgeInsets.zero,
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            itemCount: locations.length,
-            itemBuilder: (BuildContext context, int i) {
-              return GestureDetector(
-                child: listCell(i),
-                onTap: () {
-                  widget.setSearchResult(locations[i]);
-                }
-              );
-            }
-          ),
-        )
-      );
-    }
-    return Container();
+    return Expanded(
+      child: Container(
+        color: Colors.white,
+        child: ListView.builder(
+          padding: EdgeInsets.zero,
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          itemCount: locations.length,
+          itemBuilder: (BuildContext context, int i) {
+            return GestureDetector(
+              child: listCell(i),
+              onTap: () {
+                widget.setSearchResult(locations[i]);
+              }
+            );
+          }
+        ),
+      )
+    );
   }
+
   
   Widget listCell(int index) {
     return Container(

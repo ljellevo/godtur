@@ -11,6 +11,7 @@ import 'package:mcappen/utils/CameraManager.dart';
 import 'package:mcappen/utils/LocationManager.dart';
 import 'package:mcappen/utils/Network.dart';
 import 'package:mcappen/widgets/Finder.dart';
+import 'package:mcappen/widgets/PlanTrip.dart';
 import 'package:mcappen/widgets/Search.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
@@ -33,6 +34,7 @@ class _HomePageState extends State<HomePage> {
   List<Symbol> markers = [];
   Location? selectedLocation;
   LocationForecast? locationForecast;
+  UserLocation? userLocation;
   
   
   void changeTrackingMode(MyLocationTrackingMode newMode) {  
@@ -92,11 +94,26 @@ class _HomePageState extends State<HomePage> {
   }
   
   void planTrip() {
-    print("Plan");
+    Navigator.push(
+      context, 
+      MaterialPageRoute(
+        builder: (context) => PlanTrip(
+          network: network,
+          selectedLocation: selectedLocation,
+          userLocation: userLocation,
+        )
+      ),
+    );
   }
   
   void addToFavorites() {
     print("Favorites");
+  }
+  
+  void userLocationUpdated(UserLocation newUserLocation) {
+    setState(() {
+      userLocation = newUserLocation;
+    });
   }
   
   
@@ -115,6 +132,7 @@ class _HomePageState extends State<HomePage> {
           onMapClick: mapClick,
           trackCameraPosition: true,
           onCameraIdle: onMapIdle,
+          onUserLocationUpdated: userLocationUpdated,
         ),
         Finder(
           network: network, 
