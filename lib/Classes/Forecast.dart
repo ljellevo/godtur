@@ -17,7 +17,7 @@ class Forecast {
     return Forecast(
       updatedAt: json['updated_at'],
       createdAt: json['created_at'],
-    weather: new List<Weather>.from(json["weather"].map<Weather>((dynamic i) => Weather.fromJson(i as Map<String, dynamic>))),
+      weather: new List<Weather>.from(json["weather"].map<Weather>((dynamic i) => Weather.fromJson(i as Map<String, dynamic>))),
     );
   }
 }

@@ -3,12 +3,13 @@
 import 'package:mcappen/Classes/AlternativeName.dart';
 import 'package:mcappen/Classes/Coordinates.dart';
 import 'package:mcappen/Classes/Forecast.dart';
+import 'package:mcappen/Classes/GeoJson.dart';
 import 'package:mcappen/Classes/Weather.dart';
 
 class LocationForecast {
   String name;
   List<String> alternativeNames;
-  List<Coordinates> coordinates;
+  GeoJson geoJson;
   Forecast forecast;
   int importance;
   String locationType;
@@ -18,7 +19,7 @@ class LocationForecast {
   LocationForecast({
     required this.name,
     required this.alternativeNames,
-    required this.coordinates,
+    required this.geoJson,
     required this.forecast,
     required this.importance,
     required this.locationType,
@@ -63,7 +64,7 @@ class LocationForecast {
     return LocationForecast(
       name: json['name'],
       alternativeNames: json["alternative_names"].cast<String>(),
-      coordinates: new List<Coordinates>.from(json["coordinates"].map<Coordinates>((dynamic i) => Coordinates.fromJson(i as Map<String, dynamic>))),
+      geoJson: new GeoJson.fromJson(json["geo_json"]),
       forecast: Forecast.fromJson(json["forecast"]),
       importance: json['importance'],
       locationType: json['location_type'],

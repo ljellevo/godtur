@@ -12,7 +12,6 @@ import 'package:mcappen/utils/LocationManager.dart';
 import 'package:mcappen/utils/Network.dart';
 import 'package:mcappen/widgets/Finder.dart';
 import 'package:mcappen/widgets/PlanTrip.dart';
-import 'package:mcappen/widgets/Search.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 
@@ -77,7 +76,7 @@ class _HomePageState extends State<HomePage> {
   void moveCameraToLocation(Location location) {
     if(mapController != null) {
       changeTrackingMode(MyLocationTrackingMode.None);
-      CameraManager().moveCamera(controller: mapController!, location: LatLng(location.coordinates[0].latitude, location.coordinates[0].longitude));
+      CameraManager().moveCamera(controller: mapController!, location: LatLng(location.geoJson.coordinates[0][1], location.geoJson.coordinates[0][0]));
     }
   }
   

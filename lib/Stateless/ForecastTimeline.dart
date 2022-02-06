@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:mcappen/Classes/CalculatedRouteWithForecast.dart';
 import 'package:mcappen/Classes/Forecast.dart';
 import 'package:mcappen/Classes/LocationForecast.dart';
 import 'package:timelines/timelines.dart';
 
 class ForecastTimeline extends StatelessWidget {
-  final Forecast forecast;
+  final CalculatedRouteWithForecast route;
     
   ForecastTimeline({
-    required this.forecast,
+    required this.route,
   });
 
 
@@ -15,7 +16,7 @@ class ForecastTimeline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isEdgeIndex(int index) {
-      return index == 0 || index == 2;
+      return index == 0 || index == route.locations.length -1;
     }
 
     return Padding(
@@ -42,13 +43,13 @@ class ForecastTimeline extends StatelessWidget {
 
             return Padding(
               padding: EdgeInsets.only(left: 8.0),
-              child: Text(forecast.weather[index - 1].airTemperature.toString()),
+              child: Text(route.locations[index].name),
             );
           },
           itemExtentBuilder: (_, index) => isEdgeIndex(index) ? 10.0 : 30.0,
           nodeItemOverlapBuilder: (_, index) =>
               isEdgeIndex(index) ? true : null,
-          itemCount: 3,
+          itemCount: route.locations.length,
         ),
       ),
     );

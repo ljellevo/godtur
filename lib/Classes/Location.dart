@@ -1,11 +1,12 @@
 
 
 import 'package:mcappen/Classes/Coordinates.dart';
+import 'package:mcappen/Classes/GeoJson.dart';
 
 class Location {
   String name;
   List<String> alternativeNames;
-  List<Coordinates> coordinates;
+  GeoJson geoJson;
   int importance;
   String locationType;
   String municipality;
@@ -14,7 +15,7 @@ class Location {
   Location({
     required this.name,
     required this.alternativeNames,
-    required this.coordinates,
+    required this.geoJson,
     required this.importance,
     required this.locationType,
     required this.municipality,
@@ -25,11 +26,23 @@ class Location {
     return Location(
       name: json['name'],
       alternativeNames: json["alternative_names"].cast<String>(),
-      coordinates: new List<Coordinates>.from(json["coordinates"].map<Coordinates>((dynamic i) => Coordinates.fromJson(i as Map<String, dynamic>))),
+      geoJson: new GeoJson.fromJson(json["geo_json"]),
       importance: json['importance'],
       locationType: json['location_type'],
       municipality: json['municipality'],
       county: json['county']
     );
+  }
+  
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'alternative_names': alternativeNames,
+      'geo_json': geoJson.toJson(),
+      'importance': importance,
+      'location_type': locationType,
+      'municipality': municipality,
+      'county': county
+    };
   }
 }

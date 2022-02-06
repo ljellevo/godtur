@@ -33,7 +33,7 @@ class LocationManager {
           textField: forecasts[i].name, 
           textSize: 12,
           textOffset: Offset(0, 2.5), 
-          geometry: LatLng(forecasts[i].coordinates[0].latitude , forecasts[i].coordinates[0].longitude),
+          geometry: LatLng(forecasts[i].geoJson.coordinates[0][1] , forecasts[i].geoJson.coordinates[0][0]),
         ));
       }
       return forecastMarkers;

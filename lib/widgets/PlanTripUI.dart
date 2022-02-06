@@ -1,8 +1,10 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mcappen/Classes/CalculatedRouteWithForecast.dart';
+import 'package:mcappen/Classes/Location.dart';
 import 'package:mcappen/Classes/LocationForecast.dart';
-import 'package:mcappen/Classes/TextControllerFocus.dart';
+import 'package:mcappen/Classes/TextControllerLocation.dart';
 import 'package:mcappen/Stateless/MediumButton.dart';
 import 'package:mcappen/Stateless/MediumButton.dart';
 import 'package:mcappen/Stateless/PlanTripSearchInputField.dart';
@@ -16,7 +18,8 @@ import 'package:mcappen/widgets/PlanTrip.dart';
 
 class PlanTripUI extends StatefulWidget {
   final List<TextEditingController> searchControllers;
-  final List<LocationForecast> forecasts;
+  final CalculatedRouteWithForecast? route;
+  final List<Location> locations;
   final Network network;
   final VoidCallback addDestination;
   final void Function(int) removeDestination;
@@ -29,7 +32,8 @@ class PlanTripUI extends StatefulWidget {
   
   PlanTripUI({
     required this.searchControllers,
-    required this.forecasts,
+    required this.route,
+    required this.locations,
     required this.network,
     required this.addDestination,
     required this.removeDestination,
@@ -50,7 +54,6 @@ class PlanTripUI extends StatefulWidget {
 
 
 class _PlanTripUIState extends State<PlanTripUI> {
-  TextControllerFocus? activeController;
   List<TextEditingController> searchControllers = [];
   final ScrollController _scrollController = ScrollController();
   
@@ -83,6 +86,30 @@ class _PlanTripUIState extends State<PlanTripUI> {
     );
   }
   
+  Widget controllerOptionButton(int i) {
+    if(i == 0) {
+      return  Container(
+        child: SmallIconButton(
+          icon: Icons.shuffle,
+          onTap: (){
+            widget.reorderControllers(i, i + 1);
+          },
+        ),
+      );
+    } else if (i == 1) {
+      return Container(
+        width: 65,
+      );
+    } else {
+      return SmallIconButton(
+        icon: Icons.clear,
+        onTap: (){
+          widget.removeDestination(i);
+        },
+      );
+    }
+  }
+  
   Widget rearangeableList() {
     return ReorderableListView(
       scrollController: _scrollController,
@@ -108,21 +135,7 @@ class _PlanTripUIState extends State<PlanTripUI> {
                   widget.onFieldTap(i);
                 },
               ),
-              i == 0 ? 
-              Container(
-                child: SmallIconButton(
-                  icon: Icons.shuffle,
-                  onTap: (){
-                    widget.reorderControllers(i, i + 1);
-                  },
-                ),
-              ) : 
-              SmallIconButton(
-                icon: Icons.clear,
-                onTap: (){
-                  widget.removeDestination(i);
-                },
-              ),
+              controllerOptionButton(i)
           ],
         ),
       ],
@@ -177,20 +190,27 @@ class _PlanTripUIState extends State<PlanTripUI> {
   }
   
   Widget planTripResultList() {
-    return ListView(
-      shrinkWrap: true,
-      padding: EdgeInsets.all(10),
-      children: [
-        Card(
-          child: Container(
-            padding: EdgeInsets.all(20),
-            child: LocationTimeline(
-              locations: widget.forecasts,
-            ),
+    if(widget.route != null) {
+      return ListView(
+        shrinkWrap: true,
+        padding: EdgeInsets.all(10),
+        children: [
+          Card(
+            child: Container(
+              padding: EdgeInsets.all(20),
+              child: Expanded(
+                child: LocationTimeline(
+                route: widget.route!,
+                locations: widget.locations,
+              ),
+              ),
+            )
           )
-        )
-      ],
-    );
+        ],
+      );
+    } else {
+      return Container();
+    }
   }
   
   @override
@@ -212,7 +232,9 @@ class _PlanTripUIState extends State<PlanTripUI> {
             ],
           ),
         ),
-        planTripResultList()
+        Expanded(
+          child: planTripResultList()
+        )
       ],
     );
   }

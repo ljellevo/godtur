@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:mcappen/Classes/CalculatedRouteWithForecast.dart';
 import 'package:mcappen/Classes/Location.dart';
 import 'package:mcappen/Classes/LocationForecast.dart';
+import 'package:mcappen/Classes/TextControllerLocation.dart';
 import 'package:mcappen/utils/Network.dart';
 import 'package:mcappen/widgets/PlanTripUI.dart';
 import 'package:mcappen/widgets/Search.dart';
@@ -33,24 +36,32 @@ enum TraficType {
    Cycling,
 }
 
+extension ParseToString on TraficType {
+  String toShortString() {
+    return this.toString().split('.').last;
+  }
+}
+
 class _PlanTripState extends State<PlanTrip> {
-  List<TextEditingController> searchControllers = [];
-  List<LocationForecast> forecasts = [];
+  List<TextControllerLocation> locationControllers = [];
+  CalculatedRouteWithForecast? route;
   TraficType traficType = TraficType.Driving;
   
   @override
   void initState() {
     super.initState();
     TextEditingController myLocation = new TextEditingController();
+    // find my location, and add to locations array
     myLocation.text = "Min lokasjon";
-    searchControllers.add(myLocation);
-    getCurrentLocationForecast();
+    locationControllers.add(TextControllerLocation(controller: myLocation));
+    
     TextEditingController destination = new TextEditingController();
     if(widget.selectedLocation != null) {
       destination.text = widget.selectedLocation!.name;
-      getLocationForecast(widget.selectedLocation!);
+      //getLocationForecast(widget.selectedLocation!);
     }
-    searchControllers.add(destination);
+    locationControllers.add(TextControllerLocation(controller: destination));
+    getInitalRoute();
   }
   
   @override
@@ -67,7 +78,7 @@ class _PlanTripState extends State<PlanTrip> {
           setSearchResult: (Location? location) {
             setSearchResult(location, i);
           },
-          selectedLocationSearchController: searchControllers[i],
+          selectedLocationSearchController: locationControllers[i].getController(),
           textChanged: textChanged,
         )
       ),
@@ -84,77 +95,78 @@ class _PlanTripState extends State<PlanTrip> {
   
   void clearField(int i) {
     setState(() {
-      searchControllers[i].clear();
+      locationControllers[i].getController().clear();
+      locationControllers[i].setLocation(null);
     });
+    _getRoute(locationControllers, traficType);
   }
   
   void addDestination() {
-    if(searchControllers[searchControllers.length - 1].value.text != "") {
+    if(locationControllers[locationControllers.length - 1].getController().value.text != "") {
       setState(() {
-        searchControllers.add(TextEditingController());
+        locationControllers.add(TextControllerLocation(controller: TextEditingController()));
       });
     }
   }
   
   void removeDestination(int i) {
     setState(() {
-      if(forecasts.length < i) {
-        forecasts.removeAt(i);
-      }
-      searchControllers.removeAt(i);
-      sortForecasts();
+      locationControllers.removeAt(i);
     });
+    _getRoute(locationControllers, traficType);
   }
   
   void reorderControllers(int oldIndex, int newIndex) {
-    final TextEditingController item = searchControllers.removeAt(oldIndex);
+    final TextControllerLocation item = locationControllers.removeAt(oldIndex);
     setState(() {
-      searchControllers.insert(newIndex, item);
+      locationControllers.insert(newIndex, item);
     });
-    sortForecasts();
+    _getRoute(locationControllers, traficType);
   }
   
+  bool _listsAreEqual(list1, list2) {
+    var i=-1;
+    return list1.every((val) {
+      i++;
+      if(val is List && list2[i] is List) return _listsAreEqual(val,list2[i]);
+      else return list2[i] == val;
+    });
+  }
+
+
+  ///Feiler dersom bruker setter fra og til lokasjon til steder som ikke har noen waypoints.
+  ///f.eks oslo-oslo  
   void setSearchResult(Location? location, int i) {
     setState(() {
-      if(location != null){
-        searchControllers[i].text = location.name;
-        getLocationForecast(location);
-      } else {
-        searchControllers[i].text = "";
-      }
-    });
-  }
-  
-  void getCurrentLocationForecast() async {
-    if(widget.userLocation != null) {
-      LocationForecast? forecast = await widget.network.getAllForecastForSpecificCoordinates(widget.userLocation!.position);
-      if(forecast != null) {
-        forecasts.add(forecast);
-        sortForecasts();
-      }
-    }
-  }
-  
-  void getLocationForecast(Location location) async {
-    LocationForecast? forecast = await widget.network.getAllForecastForSpecificLocation(location);
-    if(forecast != null) {
-      forecasts.add(forecast);
-      sortForecasts();
-    }
-  }
-  
-  void sortForecasts() {
-    List<LocationForecast> sorted = [];
-    for(var controller in searchControllers) {
-      for(var forecast in forecasts) {
-        if(controller.text == forecast.name){
-          sorted.add(forecast);
+      if(location != null){   
+        if(locationControllers[i].getLocation() != null) {
+          if(!_listsAreEqual(locationControllers[i].getLocation()!.geoJson.coordinates[0], location.geoJson.coordinates[0])){
+            locationControllers[i].getController().text = location.name;
+            locationControllers[i].setLocation(location);
+            _getRoute(locationControllers, traficType);
+          }
+        } else {
+          locationControllers[i].getController().text = location.name;
+          locationControllers[i].setLocation(location);
+          _getRoute(locationControllers, traficType);
         }
+      } else {
+        locationControllers[i].getController().text = "";
       }
-    }                     
-    setState(() {
-      forecasts = sorted;
     });
+  }
+  
+  void getInitalRoute() async {
+    if(widget.userLocation != null) {
+      Location? userLocation = await widget.network.getLocationByCoordinate(widget.userLocation!);
+      if(userLocation != null && widget.selectedLocation != null){
+        locationControllers[0].setLocation(userLocation);
+        locationControllers[1].setLocation(widget.selectedLocation!);
+        _getRoute(locationControllers, traficType);
+      } else {
+        // Fant ikke bruker lokasjon, dette må håndteres
+      }
+    }
   }
   
   void changeTraficType(TraficType newType) {
@@ -163,12 +175,39 @@ class _PlanTripState extends State<PlanTrip> {
     });
   }
   
+  
+  // Anonomus functions
+  void _getRoute(List<TextControllerLocation> locationControllers, TraficType traficType) async {
+    List<Location> locations = [];
+    for(var loc in locationControllers){
+      if(loc.getLocation() != null){
+        locations.add(loc.getLocation()!);
+      }
+    }
+    route = await widget.network.getRouteBetweenLocations(locations, traficType);
+    setState(() {
+      if(route != null){
+        print("got route");
+      }
+      route = route;
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
+    List<Location> locations = [];
+    List<TextEditingController> searchControllers =  [];
+    for(var loc in locationControllers){
+      if(loc.getLocation() != null){
+        locations.add(loc.getLocation()!);
+      }
+      searchControllers.add(loc.getController());
+    }
     return Material(
       child: PlanTripUI(
         searchControllers: searchControllers,
-        forecasts: forecasts,
+        route: route,
+        locations: locations,
         network: widget.network,
         addDestination: addDestination,
         removeDestination: removeDestination,

@@ -2,11 +2,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:mcappen/Classes/CalculatedRouteWithForecast.dart';
 import 'package:mcappen/Classes/Coordinates.dart';
 import 'package:mcappen/Classes/Forecast.dart';
 import 'package:mcappen/Classes/Location.dart';
 import 'package:mcappen/Classes/LocationForecast.dart';
 import 'package:mcappen/Classes/Token.dart';
+import 'package:mcappen/widgets/PlanTrip.dart';
 
 class Network {
   
@@ -41,6 +43,18 @@ class Network {
       return locations;
       }
     return [];
+  }
+  
+  
+  Future<Location?> getLocationByCoordinate(UserLocation location) async {
+    await validateToken();
+    String lat = location.position.latitude.toString();
+    String lon = location.position.longitude.toString();
+    http.Response response = await http.get(Uri.parse('http://192.168.1.146:8080/api/locations?method=coordinate&latitude=' + lat + '&longitude=' + lon + '&access_token=' + token!.accessToken));
+    if(response.body != "null" && response.statusCode == 200) {
+      return Location.fromJson(json.decode(response.body));
+    }
+    return null;
   }
   
   Future<List<Location>> getLocationBySearch(String searchValue) async {
@@ -78,18 +92,16 @@ class Network {
   
   Future<LocationForecast?> getCurrentForecastForSpecificLocation(Location location) async {
     await validateToken();
-    print(location.coordinates[0].latitude);
-    print(location.coordinates[0].longitude);
     // 192.168.1.146:8080/api/forecast?method=coordinate&lat=59.91187031882089&lon=10.733528334101853&access_token=RUMEUXY2NZSM5IZX_GP85A&time=-1
     // http.Response response = await http.get(Uri.parse('http://192.168.1.146:8080/api/forecast?method=bounds&lowLat=' + lowLat + '&lowLon=' + lowLon + '&uppLat=' + uppLat + '&uppLon=' + uppLon + '&access_token=' + token!.accessToken));
-    http.Response response = await http.get(Uri.parse('http://192.168.1.146:8080/api/forecast?method=coordinate&lat=' + location.coordinates[0].latitude.toString() + '&lon=' + location.coordinates[0].longitude.toString() + '&access_token=' + token!.accessToken));
+    http.Response response = await http.get(Uri.parse('http://192.168.1.146:8080/api/forecast?method=coordinate&lat=' + location.geoJson.coordinates[0][1].toString() + '&lon=' + location.geoJson.coordinates[0][0].toString() + '&access_token=' + token!.accessToken));
     if(response.body != "null" && response.statusCode == 200) {
       
       Forecast forecast = Forecast.fromJson(json.decode(response.body));
       LocationForecast locationForecast = LocationForecast(
         name: location.name,
         alternativeNames: location.alternativeNames,
-        coordinates: location.coordinates,
+        geoJson: location.geoJson,
         forecast: forecast,
         importance: location.importance,
         locationType: location.locationType,
@@ -100,7 +112,7 @@ class Network {
     }
     return null;
   }
-  
+  /*
   Future<LocationForecast?> getAllForecastForSpecificCoordinates(LatLng location) async {
     await validateToken();
     // 192.168.1.146:8080/api/forecast?method=coordinate&lat=59.91187031882089&lon=10.733528334101853&access_token=RUMEUXY2NZSM5IZX_GP85A&time=-1
@@ -122,21 +134,19 @@ class Network {
     }
     return null;
   }
+  */
   
   Future<LocationForecast?> getAllForecastForSpecificLocation(Location location) async {
     await validateToken();
-    print(location.coordinates[0].latitude);
-    print(location.coordinates[0].longitude);
     // 192.168.1.146:8080/api/forecast?method=coordinate&lat=59.91187031882089&lon=10.733528334101853&access_token=RUMEUXY2NZSM5IZX_GP85A&time=-1
     // http.Response response = await http.get(Uri.parse('http://192.168.1.146:8080/api/forecast?method=bounds&lowLat=' + lowLat + '&lowLon=' + lowLon + '&uppLat=' + uppLat + '&uppLon=' + uppLon + '&access_token=' + token!.accessToken));
-    http.Response response = await http.get(Uri.parse('http://192.168.1.146:8080/api/forecast?method=coordinate&time=-1&lat=' + location.coordinates[0].latitude.toString() + '&lon=' + location.coordinates[0].longitude.toString() + '&access_token=' + token!.accessToken));
+    http.Response response = await http.get(Uri.parse('http://192.168.1.146:8080/api/forecast?method=coordinate&time=-1&lat=' + location.geoJson.coordinates[0][1].toString() + '&lon=' + location.geoJson.coordinates[0][0].toString() + '&access_token=' + token!.accessToken));
     if(response.body != "null" && response.statusCode == 200) {
-      
       Forecast forecast = Forecast.fromJson(json.decode(response.body));
       LocationForecast locationForecast = LocationForecast(
         name: location.name,
         alternativeNames: location.alternativeNames,
-        coordinates: location.coordinates,
+        geoJson: location.geoJson,
         forecast: forecast,
         importance: location.importance,
         locationType: location.locationType,
@@ -144,6 +154,21 @@ class Network {
         county: location.county
       );
       return locationForecast;
+    }
+    return null;
+  }
+  
+  Future<CalculatedRouteWithForecast?> getRouteBetweenLocations(List<Location> locations, TraficType traficType) async {
+    await validateToken();
+    // 192.168.1.146:8080/api/forecast?method=coordinate&lat=59.91187031882089&lon=10.733528334101853&access_token=RUMEUXY2NZSM5IZX_GP85A&time=-1
+    // http.Response response = await http.get(Uri.parse('http://192.168.1.146:8080/api/forecast?method=bounds&lowLat=' + lowLat + '&lowLon=' + lowLon + '&uppLat=' + uppLat + '&uppLon=' + uppLon + '&access_token=' + token!.accessToken));
+    Uri uri = Uri.parse('http://192.168.1.146:8080/api/route/?access_token=' + token!.accessToken + '&traficType=' + traficType.toShortString().toLowerCase());
+    http.Response response = await http.post(
+      uri, 
+      body: json.encode({"locations": locations}),
+    );
+    if(response.body != "null" && response.statusCode == 200) { 
+      return CalculatedRouteWithForecast.fromJson(json.decode(response.body));
     }
     return null;
   }

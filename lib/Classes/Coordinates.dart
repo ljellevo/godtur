@@ -1,18 +1,15 @@
 
 
 class Coordinates {
-  double latitude;
-  double longitude;
+  List<double> coordinates;
   
   Coordinates({
-    required this.latitude,
-    required this.longitude
+    required this.coordinates
   });
   
   factory Coordinates.fromJson(Map<String, dynamic> json){
     return Coordinates (
-      latitude: json["latitude"],
-      longitude: json["longitude"]
+      coordinates: json["coordinates"],
     );
   }
 }
