@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -5,8 +7,11 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:mcappen/Classes/CalculatedRouteWithForecast.dart';
 import 'package:mcappen/Classes/Location.dart';
 import 'package:mcappen/Classes/LocationForecast.dart';
+import 'package:mcappen/Classes/RouteLinesAndBounds.dart';
 import 'package:mcappen/Classes/TextControllerLocation.dart';
+import 'package:mcappen/utils/CameraManager.dart';
 import 'package:mcappen/utils/Network.dart';
+import 'package:mcappen/utils/Utils.dart';
 import 'package:mcappen/widgets/PlanTripUI.dart';
 import 'package:mcappen/widgets/Search.dart';
 
@@ -46,6 +51,9 @@ class _PlanTripState extends State<PlanTrip> {
   List<TextControllerLocation> locationControllers = [];
   CalculatedRouteWithForecast? route;
   TraficType traficType = TraficType.Driving;
+  MapboxMapController? mapController;
+  RouteLinesAndBounds routeLinesAndBounds = RouteLinesAndBounds();
+  StreamSubscription? RESTAsyncHandler;
   
   @override
   void initState() {
@@ -67,6 +75,9 @@ class _PlanTripState extends State<PlanTrip> {
   @override
   void dispose() {
     super.dispose();
+    if(RESTAsyncHandler != null) {
+      RESTAsyncHandler!.cancel();
+    }
   }
   
   void onFieldTap(int i) {    
@@ -169,21 +180,36 @@ class _PlanTripState extends State<PlanTrip> {
     }
   }
   
-  void changeTraficType(TraficType newType) {
+  void changeTraficType(TraficType newType) async {
     setState(() {
       traficType = newType;
+      //route = null;
     });
+    await _getRoute(locationControllers, traficType);
+    updateMapRoute();
   }
   
   
   // Anonomus functions
-  void _getRoute(List<TextControllerLocation> locationControllers, TraficType traficType) async {
+  Future<bool> _getRoute(List<TextControllerLocation> locationControllers, TraficType traficType) async {
     List<Location> locations = [];
     for(var loc in locationControllers){
       if(loc.getLocation() != null){
         locations.add(loc.getLocation()!);
       }
     }
+    
+    RESTAsyncHandler = widget.network.getRouteBetweenLocations(locations, traficType).asStream().listen((CalculatedRouteWithForecast? route) { 
+      print("Response gotten");
+      setState(() {
+        if(route != null){
+          routeLinesAndBounds = Utils().getBounds(route);
+        }
+        this.route = route;
+      });
+    });
+    
+    /*
     route = await widget.network.getRouteBetweenLocations(locations, traficType);
     setState(() {
       if(route != null){
@@ -191,6 +217,33 @@ class _PlanTripState extends State<PlanTrip> {
       }
       route = route;
     });
+    */
+    return true;
+  }
+  
+  void onMapLoaded(MapboxMapController controller) async {
+    setState(() {
+      mapController = controller;
+      updateMapRoute();
+    });
+  }
+  
+  void updateMapRoute() async {
+    await mapController!.clearLines();
+    mapController!.addLine(
+        LineOptions(
+          geometry: routeLinesAndBounds.getGeoJson(),
+          lineColor: "#ff0000",
+          lineWidth: 5.0,
+          lineOpacity: 0.5,
+          draggable: false
+        ),
+      );
+    mapController!.moveCamera(CameraUpdate.newLatLngBounds(LatLngBounds(southwest: routeLinesAndBounds.getSouthwest()!, northeast: routeLinesAndBounds.getNortheast()!), left: 50, top: 50, bottom: 50, right: 50));
+  }
+  
+  void onMapIdle() {
+    mapController!.moveCamera(CameraUpdate.newLatLngBounds(LatLngBounds(southwest: routeLinesAndBounds.getSouthwest()!, northeast: routeLinesAndBounds.getNortheast()!), left: 50, top: 50, bottom: 50, right: 50));
   }
   
   @override
@@ -217,6 +270,9 @@ class _PlanTripState extends State<PlanTrip> {
         reorderControllers: reorderControllers,
         traficType: traficType,
         changeTraficType: changeTraficType,
+        onMapLoaded: onMapLoaded,
+        routeLinesAndBounds: routeLinesAndBounds,
+        onMapIdle: onMapIdle
       ),
     );
   }

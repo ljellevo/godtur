@@ -1,6 +1,9 @@
 
 
 import 'package:flutter/cupertino.dart';
+import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:mcappen/Classes/CalculatedRouteWithForecast.dart';
+import 'package:mcappen/Classes/RouteLinesAndBounds.dart';
 import 'package:mcappen/Classes/Weather.dart';
 
 class Utils {
@@ -104,7 +107,64 @@ class Utils {
     
     String hour = date.hour.toString().length == 2 ? date.hour.toString() : "0" + date.hour.toString();
     String nextHour = nextH.toString().length == 2 ? nextH.toString() : "0" + nextH.toString();
-    
     return hour.toString() + "-" + nextHour.toString();
+  }
+  
+  RouteLinesAndBounds getBounds(CalculatedRouteWithForecast route) {
+    RouteLinesAndBounds routeLinesAndBounds = RouteLinesAndBounds();
+    
+    double lowLat = 0.0;
+    double lowLon = 0.0;
+    double upLat = 0.0;
+    double upLon = 0.0;
+        
+    for(var i = 0; i < route.directions.coordinates.length; i++) {
+      LatLng currentCoord = LatLng(route.directions.coordinates[i][1], route.directions.coordinates[i][0]);
+      routeLinesAndBounds.add(currentCoord);
+      if(i == 0) {
+        lowLat = currentCoord.latitude;
+        upLat = currentCoord.latitude;
+        lowLon = currentCoord.longitude;
+        upLon = currentCoord.longitude;
+        continue;
+      }
+      if(lowLat > currentCoord.latitude) {
+        lowLat = currentCoord.latitude;
+      }
+      
+      if(upLat < currentCoord.latitude) {
+        upLat = currentCoord.latitude;
+      }
+      
+      if(lowLon > currentCoord.longitude) {
+        lowLon = currentCoord.longitude;
+      }
+      
+      if(upLon < currentCoord.longitude) {
+        upLon = currentCoord.longitude;
+      }
+      
+      /*
+      if(routeLinesAndBounds.getSouthwest() == null) {
+        routeLinesAndBounds.setSouthwest(currentCoord);
+      }
+      
+      if(routeLinesAndBounds.getNortheast() == null) {
+        routeLinesAndBounds.setNortheast(currentCoord);
+      }
+      
+      if(currentCoord.latitude < routeLinesAndBounds.getSouthwest()!.latitude && currentCoord.longitude < routeLinesAndBounds.getSouthwest()!.longitude) {
+        routeLinesAndBounds.setSouthwest(currentCoord);
+      } else if(currentCoord.latitude > routeLinesAndBounds.getNortheast()!.latitude && currentCoord.longitude > routeLinesAndBounds.getNortheast()!.longitude) {
+        routeLinesAndBounds.setNortheast(currentCoord);
+      }
+      */
+      
+      
+    }
+    routeLinesAndBounds.setSouthwest(LatLng(lowLat, lowLon));
+    routeLinesAndBounds.setNortheast(LatLng(upLat, upLon));
+    
+    return routeLinesAndBounds;
   }
 }

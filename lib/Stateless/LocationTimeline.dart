@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:mcappen/Classes/CalculatedRouteWithForecast.dart';
 import 'package:mcappen/Classes/Location.dart';
 import 'package:mcappen/Stateless/ForecastTimeline.dart';
+import 'package:mcappen/Stateless/TemperatureText.dart';
+import 'package:mcappen/utils/Utils.dart';
 import 'package:timelines/timelines.dart';
 
 class LocationTimeline extends StatelessWidget {
-  final List<Location> locations;
   final CalculatedRouteWithForecast route;
   
   LocationTimeline({
     required this.route,
-    required this.locations,
     Key? key
   }) : super(key: key);
   
@@ -19,13 +19,32 @@ class LocationTimeline extends StatelessWidget {
   List<Widget> getListContent(BuildContext context, int index) {
     return [
       Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            route.locations[index].name,
-            style: DefaultTextStyle.of(context).style.copyWith(
-              fontSize: 18.0,
-            ),
+          Row(
+            children: [
+              Text(
+                Utils().getFormattedTimefromDate(
+                  DateTime.fromMillisecondsSinceEpoch(
+                    DateTime.now().millisecondsSinceEpoch + (route.locations[index == 0 ? index : (route.locations.length - 1)].duration.toInt()*1000)
+                  )
+                ),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey
+                ),
+              ),
+              Container(
+                width: 10,
+              ),
+              Text(
+                route.locations[index].name,
+                style: DefaultTextStyle.of(context).style.copyWith(
+                  fontSize: 18.0,
+                ),
+              ),
+            ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -36,13 +55,12 @@ class LocationTimeline extends StatelessWidget {
                 width: 44,
                 height: 44,
               ) : Container(),
-              Text(
-                route.locations[index].getCurrentAirTemperature().toString() + "°",
-                style: TextStyle(
-                  fontSize: 44,
-                  color: route.locations[index].getCurrentAirTemperature() >= 0 ? Colors.red[700] : Colors.blue[700]
-                ),
+              Container(
+                width: 10,
               ),
+              TemperatureText(
+                locationRouteForecast: route.locations[index],
+              )
             ],
           )
         ],
@@ -58,41 +76,42 @@ class LocationTimeline extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: FixedTimeline.tileBuilder(
-      theme: TimelineThemeData(
-        nodePosition: 0,
-        color: Color(0xff989898),
-        indicatorTheme: IndicatorThemeData(
-          position: 0,
-          size: 20.0,
+        theme: TimelineThemeData(
+          nodePosition: 0,
+          color: Color(0xff989898),
+          indicatorTheme: IndicatorThemeData(
+            position: 0,
+            size: 20.0,
+          ),
+          connectorTheme: ConnectorThemeData(
+            thickness: 2.5,
+          ),
         ),
-        connectorTheme: ConnectorThemeData(
-          thickness: 2.5,
-        ),
-      ),
-      builder: TimelineTileBuilder.connected(
-        connectionDirection: ConnectionDirection.before,
-        itemCount: 2,
-        contentsBuilder: (_, index) {
-          return Padding(
-            padding: EdgeInsets.only(left: 8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: getListContent(context, index == 0 ? 0 : route.locations.length -1),
-            ),
-          );
-        },
-        indicatorBuilder: (_, index) {
-          return OutlinedDotIndicator(
-              borderWidth: 2.5,
-              color: Colors.blueAccent,
+        builder: TimelineTileBuilder.connected(
+          connectionDirection: ConnectionDirection.before,
+          itemCount: 2,
+          contentsBuilder: (_, index) {
+            return Container(
+              padding: EdgeInsets.only(left: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: getListContent(context, index == 0 ? 0 : route.locations.length -1),
+              ),
             );
-        },
-        connectorBuilder: (_, index, ___) => SolidLineConnector(
-          color: Colors.blueAccent,
-        ),
-      )
-    ),
+          },
+          
+          indicatorBuilder: (_, index) {
+            return OutlinedDotIndicator(
+                borderWidth: 2.5,
+                color: Colors.blueAccent,
+              );
+          },
+          connectorBuilder: (_, index, ___) => SolidLineConnector(
+            color: Colors.blueAccent,
+          ),
+        )
+      ),
     );
   }
 }

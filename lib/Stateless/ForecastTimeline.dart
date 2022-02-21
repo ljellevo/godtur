@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mcappen/Classes/CalculatedRouteWithForecast.dart';
 import 'package:mcappen/Classes/Forecast.dart';
 import 'package:mcappen/Classes/LocationForecast.dart';
+import 'package:mcappen/Stateless/TemperatureText.dart';
+import 'package:mcappen/utils/Utils.dart';
 import 'package:timelines/timelines.dart';
 
 class ForecastTimeline extends StatelessWidget {
@@ -19,37 +21,82 @@ class ForecastTimeline extends StatelessWidget {
       return index == 0 || index == route.locations.length -1;
     }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 0.0),
       child: FixedTimeline.tileBuilder(
         theme: TimelineTheme.of(context).copyWith(
           nodePosition: 0,
           connectorTheme: TimelineTheme.of(context).connectorTheme.copyWith(
-            thickness: 1.0,
+            thickness: 2.0,
           ),
           indicatorTheme: TimelineTheme.of(context).indicatorTheme.copyWith(
             size: 10.0,
             position: 0.5,
           ),
         ),
-        builder: TimelineTileBuilder(
-          indicatorBuilder: (_, index) => !isEdgeIndex(index) ? Indicator.outlined(borderWidth: 1.0) : null,
-          startConnectorBuilder: (_, index) => Connector.solidLine(),
-          endConnectorBuilder: (_, index) => Connector.solidLine(),
+        
+        builder: TimelineTileBuilder.connected(
+          indicatorBuilder: (_, index) => !isEdgeIndex(index) ? Indicator.outlined(borderWidth: 2.0, color: Colors.green,) : null,
+          itemCount: route.locations.length,
+          contentsAlign: ContentsAlign.basic,
+          connectorBuilder: (_, index, type) {
+            return SolidLineConnector(
+              color: Colors.green,
+            );
+          },
           contentsBuilder: (_, index) {
             if (isEdgeIndex(index)) {
               return null;
             }
 
-            return Padding(
+            return Container(
               padding: EdgeInsets.only(left: 8.0),
-              child: Text(route.locations[index].name),
+              //margin: EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                   Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        Utils().getFormattedTimeRangefromDate(DateTime.fromMillisecondsSinceEpoch(route.locations[index].getCurrentAndFutureWeatherForecasts()[0].time*1000)),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey
+                        ),
+                      ), 
+                      Container(
+                        width: 10,
+                      ),
+                      Text(route.locations[index].name),
+                    ]
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      route.locations[index].forecast.weather[0].symbolCode != "" ? 
+                      Image.asset(
+                        "assets/icons/" +  route.locations[index].forecast.weather[0].symbolCode + ".png",
+                        width: 40,
+                        height: 40,
+                      ) : Container(),
+                      Container(
+                        width: 10,
+                      ),
+                      TemperatureText(
+                        locationRouteForecast: route.locations[index],
+                        fontSize: 24,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             );
           },
-          itemExtentBuilder: (_, index) => isEdgeIndex(index) ? 10.0 : 30.0,
-          nodeItemOverlapBuilder: (_, index) =>
-              isEdgeIndex(index) ? true : null,
-          itemCount: route.locations.length,
+          itemExtentBuilder: (_, index) => isEdgeIndex(index) ? 10.0 : 75.0,
+          //nodeItemOverlapBuilder: (_, index) => isEdgeIndex(index) ? true : null,
+          
         ),
       ),
     );

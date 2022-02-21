@@ -116,7 +116,7 @@ class _FloatingPanelState extends State<FloatingPanel> {
                           widget.locationForecast != null ? widget.locationForecast!.getCurrentAirTemperature().toString() + "°" : "Ikke funnet",
                           style: TextStyle(
                             fontSize: 44,
-                            color: widget.locationForecast!.getCurrentAirTemperature() >= 0 ? Colors.red[700] : Colors.blue[700]
+                            color: widget.locationForecast != null && widget.locationForecast!.getCurrentAirTemperature() >= 0 ? Colors.red[700] : Colors.blue[700]
                           ),
                         ),
                         Text(

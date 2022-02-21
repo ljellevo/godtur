@@ -33,22 +33,30 @@ class LocationRouteForecast {
   
   num getCurrentAirTemperature() {
     double timestamp = DateTime.now().millisecondsSinceEpoch / 1000;
+    if(forecast.weather.length == 1) {
+      return forecast.weather[0].airTemperature;
+    }
     for(var i = 0; i < forecast.weather.length; i++) {
       if(forecast.weather[i].time > timestamp - 3600 && forecast.weather[i].time <= timestamp) {
         return forecast.weather[i].airTemperature;
       }
     }
-    return -1;
+    return -1000;
   }
+  
+
   
   num getCurrentWindSpeed() {
     double timestamp = DateTime.now().millisecondsSinceEpoch / 1000;
+    if(forecast.weather.length == 1) {
+      return forecast.weather[0].windSpeed;
+    }
     for(var i = 0; i < forecast.weather.length; i++) {
       if(forecast.weather[i].time > timestamp - 3600 && forecast.weather[i].time <= timestamp) {
         return forecast.weather[i].windSpeed;
       }
     }
-    return -1;
+    return -1000;
   }
   
   List<Weather> getCurrentAndFutureWeatherForecasts() {

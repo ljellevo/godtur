@@ -1,9 +1,11 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:mcappen/Classes/CalculatedRouteWithForecast.dart';
 import 'package:mcappen/Classes/Location.dart';
 import 'package:mcappen/Classes/LocationForecast.dart';
+import 'package:mcappen/Classes/RouteLinesAndBounds.dart';
 import 'package:mcappen/Classes/TextControllerLocation.dart';
 import 'package:mcappen/Stateless/MediumButton.dart';
 import 'package:mcappen/Stateless/MediumButton.dart';
@@ -11,6 +13,9 @@ import 'package:mcappen/Stateless/PlanTripSearchInputField.dart';
 import 'package:mcappen/Stateless/SearchInputField.dart';
 import 'package:mcappen/Stateless/SmallIconButton.dart';
 import 'package:mcappen/Stateless/LocationTimeline.dart';
+import 'package:mcappen/Stateless/TemperatureText.dart';
+import 'package:mcappen/assets/Secrets.dart';
+import 'package:mcappen/utils/CameraManager.dart';
 import 'package:mcappen/utils/Network.dart';
 import 'package:mcappen/utils/Styles.dart';
 import 'package:mcappen/widgets/PlanTrip.dart';
@@ -29,6 +34,9 @@ class PlanTripUI extends StatefulWidget {
   final void Function(int, int) reorderControllers;
   final TraficType traficType;
   final void Function(TraficType) changeTraficType;
+  final void Function(MapboxMapController) onMapLoaded;
+  final RouteLinesAndBounds routeLinesAndBounds;
+  final void Function() onMapIdle;
   
   PlanTripUI({
     required this.searchControllers,
@@ -43,6 +51,9 @@ class PlanTripUI extends StatefulWidget {
     required this.reorderControllers,
     required this.traficType,
     required this.changeTraficType,
+    required this.onMapLoaded,
+    required this.routeLinesAndBounds,
+    required this.onMapIdle,
     Key? key
   }) : super(key: key);
 
@@ -56,6 +67,7 @@ class PlanTripUI extends StatefulWidget {
 class _PlanTripUIState extends State<PlanTripUI> {
   List<TextEditingController> searchControllers = [];
   final ScrollController _scrollController = ScrollController();
+
   
   
   List<BoxShadow>? _containerBoxShadow() {
@@ -193,19 +205,142 @@ class _PlanTripUIState extends State<PlanTripUI> {
     if(widget.route != null) {
       return ListView(
         shrinkWrap: true,
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.fromLTRB(10, 10, 10, 30),
         children: [
           Card(
             child: Container(
-              padding: EdgeInsets.all(20),
-              child: Expanded(
-                child: LocationTimeline(
-                route: widget.route!,
-                locations: widget.locations,
-              ),
+              padding: EdgeInsets.only(top: 10, bottom: 10),
+              child: Column(
+                children: [
+                  //Text("Oppsummering"),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Column(
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [ 
+                              Icon(Icons.keyboard_arrow_down, size: 24, color: widget.route!.getLowestAirTemperature().getCurrentAirTemperature() >= 0 ? Colors.red[700] : Colors.blue[700],),
+                              TemperatureText(locationRouteForecast: widget.route!.getLowestAirTemperature()),
+                            ],
+                          ),
+                          Text(widget.route!.getLowestAirTemperature().name)
+                        ],
+                      ),
+                      //Icon(Icons.keyboard_arrow_up)
+                      Column(
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              TemperatureText(locationRouteForecast: widget.route!.getHighestAirTemperature()),
+                              Icon(Icons.keyboard_arrow_up, size: 24, color: widget.route!.getHighestAirTemperature().getCurrentAirTemperature() >= 0 ? Colors.red[700] : Colors.blue[700],),
+                            ],
+                          ),
+                           Text(widget.route!.getHighestAirTemperature().name)
+                        ],
+                      )
+                    ],
+                  )
+                ],
               ),
             )
-          )
+          ),
+          Card(
+            child: Container(
+              padding: EdgeInsets.all(20),
+              child: LocationTimeline(
+                route: widget.route!,
+              ),
+            )
+          ),
+          Card(
+            child: Container(
+              padding: EdgeInsets.only(top: 10, bottom: 10),
+              child: Column(
+                children: [
+                  //Text("Oppsummering"),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Column(
+                        children: [
+                          Text(
+                            widget.route!.getTotalDistance().toString(),
+                            style: TextStyle(
+                              fontSize: 34
+                            ),
+                          )
+                        ],
+                      ),
+                      //Icon(Icons.keyboard_arrow_up)
+                      Column(
+                        children: [
+                          Text(
+                            widget.route!.getTotalDuration().toString(),
+                            style: TextStyle(
+                              fontSize: 34
+                            ),
+                          )
+                        ],
+                      ),
+                      
+                    ],
+                  ),
+                  Text(
+                    "(Distanse og tid er kun estimater)",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey
+                    ),
+                  )
+                ],
+              ),
+            )
+          ),
+          Card(
+            child: Container(
+              height: 400,
+              child: MapboxMap(
+                accessToken: Secrets.MAPBOX_ACCESS_TOKEN,
+                onMapCreated: widget.onMapLoaded,
+                initialCameraPosition: CameraPosition(target: LatLng( widget.route!.locations[widget.route!.locations.length - 1].geoJson.coordinates[0][1],  widget.route!.locations[widget.route!.locations.length - 1].geoJson.coordinates[0][0]), zoom: 10),
+                styleString: Secrets.MAPBOX_STYLE_URL,
+                onCameraIdle: widget.onMapIdle,
+                compassEnabled: false,
+                rotateGesturesEnabled: false,
+                scrollGesturesEnabled: false,
+                zoomGesturesEnabled: false,
+                tiltGesturesEnabled: false,
+                //cameraTargetBounds: CameraTargetBounds(LatLngBounds(southwest: widget.southwest!, northeast: widget.northeast!)),
+              ),
+            )
+          ),
+          Card(
+            child: Container(
+              padding: EdgeInsets.only(top: 10, bottom: 10),
+              child: Column(
+                children: [
+                  //Text("Oppsummering"),
+                  Text(
+                    "Navigasjon N/A",
+                    style: TextStyle(
+                      fontSize: 32,
+                      color: Colors.grey
+                    ),
+                  ),
+                  Text(
+                    "Åpner google maps",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ),
         ],
       );
     } else {
@@ -213,17 +348,26 @@ class _PlanTripUIState extends State<PlanTripUI> {
     }
   }
   
+
+  
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Stack(
       children: [
+        Container(
+          child: Container(
+            padding: EdgeInsets.only(top: widget.searchControllers.length == 2 ? 220 : 270),
+            child: planTripResultList(),
+          )
+        ),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: _containerBoxShadow()
           ),
+          
           padding: EdgeInsets.fromLTRB(15, 56, 15, 0),
-          margin: EdgeInsets.only(bottom: 10),
+          //margin: EdgeInsets.only(bottom: 10),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -232,9 +376,6 @@ class _PlanTripUIState extends State<PlanTripUI> {
             ],
           ),
         ),
-        Expanded(
-          child: planTripResultList()
-        )
       ],
     );
   }
