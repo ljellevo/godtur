@@ -1,11 +1,11 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mcappen/Stateless/MediumButton.dart';
-import 'package:mcappen/Stateless/SearchInputField.dart';
-import 'package:mcappen/components/SearchResult.dart';
+import 'package:mcappen/components/MediumButton.dart';
+import 'package:mcappen/components/SearchInputField.dart';
 import 'package:mcappen/utils/Network.dart';
 import 'package:mcappen/utils/Typedefs.dart';
+import 'package:mcappen/views/Search/SearchResult.dart';
 
 
 

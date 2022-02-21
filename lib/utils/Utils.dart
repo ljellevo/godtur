@@ -42,27 +42,18 @@ class Utils {
   List<List<Weather>> getFormattedDateArrayfromDate(List<Weather> weather) {
     List<List<Weather>> differentDays = [];
     List<Weather> weatherForAGivenDay = [];
-    //print(" ");
-    //print(" ----- ");
     for(var i = 0; i < weather.length; i++) {
-      
       if(i - 1 >= 0) {
         int currentForecastDay = DateTime.fromMillisecondsSinceEpoch(weather[i].time * 1000).day;
         int previousForcastDay = DateTime.fromMillisecondsSinceEpoch(weather[i - 1].time * 1000).day;
         if(currentForecastDay == previousForcastDay) {
-          //print("Add dynamic");
-          //print(weather[i].airTemperature);
           weatherForAGivenDay.add(weather[i]);
         } else {
-          //print("New day");
-          //print(weather[i].airTemperature);
           differentDays.add(weatherForAGivenDay);
           weatherForAGivenDay = [];
           weatherForAGivenDay.add(weather[i]);
         }
       } else {
-        //print("Add static");
-        //print(weather[i].airTemperature);
         weatherForAGivenDay.add(weather[i]);
       }
     }
@@ -143,24 +134,6 @@ class Utils {
       if(upLon < currentCoord.longitude) {
         upLon = currentCoord.longitude;
       }
-      
-      /*
-      if(routeLinesAndBounds.getSouthwest() == null) {
-        routeLinesAndBounds.setSouthwest(currentCoord);
-      }
-      
-      if(routeLinesAndBounds.getNortheast() == null) {
-        routeLinesAndBounds.setNortheast(currentCoord);
-      }
-      
-      if(currentCoord.latitude < routeLinesAndBounds.getSouthwest()!.latitude && currentCoord.longitude < routeLinesAndBounds.getSouthwest()!.longitude) {
-        routeLinesAndBounds.setSouthwest(currentCoord);
-      } else if(currentCoord.latitude > routeLinesAndBounds.getNortheast()!.latitude && currentCoord.longitude > routeLinesAndBounds.getNortheast()!.longitude) {
-        routeLinesAndBounds.setNortheast(currentCoord);
-      }
-      */
-      
-      
     }
     routeLinesAndBounds.setSouthwest(LatLng(lowLat, lowLon));
     routeLinesAndBounds.setNortheast(LatLng(upLat, upLon));

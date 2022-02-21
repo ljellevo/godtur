@@ -5,7 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:mcappen/Classes/Location.dart';
 import 'package:mcappen/Classes/LocationForecast.dart';
 import 'package:mcappen/Classes/Weather.dart';
-import 'package:mcappen/components/OverlayStickyListItem.dart';
+import 'package:mcappen/views/Home/OverlayStickyListItem.dart';
 import 'package:mcappen/utils/Styles.dart';
 import 'package:mcappen/utils/Utils.dart';
 import 'package:sticky_infinite_list/sticky_infinite_list.dart';

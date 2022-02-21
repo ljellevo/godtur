@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mcappen/Classes/CalculatedRouteWithForecast.dart';
 import 'package:mcappen/Classes/Forecast.dart';
 import 'package:mcappen/Classes/LocationForecast.dart';
-import 'package:mcappen/Stateless/TemperatureText.dart';
+import 'package:mcappen/components/TemperatureText.dart';
+import 'package:mcappen/utils/Styles.dart';
 import 'package:mcappen/utils/Utils.dart';
 import 'package:timelines/timelines.dart';
 
@@ -36,12 +37,12 @@ class ForecastTimeline extends StatelessWidget {
         ),
         
         builder: TimelineTileBuilder.connected(
-          indicatorBuilder: (_, index) => !isEdgeIndex(index) ? Indicator.outlined(borderWidth: 2.0, color: Colors.green,) : null,
+          indicatorBuilder: (_, index) => !isEdgeIndex(index) ? Indicator.outlined(borderWidth: 2.0, color: Styles.error,) : null,
           itemCount: route.locations.length,
           contentsAlign: ContentsAlign.basic,
           connectorBuilder: (_, index, type) {
             return SolidLineConnector(
-              color: Colors.green,
+              color: Styles.error,
             );
           },
           contentsBuilder: (_, index) {

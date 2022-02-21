@@ -6,14 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:mcappen/Classes/CalculatedRouteWithForecast.dart';
 import 'package:mcappen/Classes/Location.dart';
-import 'package:mcappen/Classes/LocationForecast.dart';
 import 'package:mcappen/Classes/RouteLinesAndBounds.dart';
 import 'package:mcappen/Classes/TextControllerLocation.dart';
-import 'package:mcappen/utils/CameraManager.dart';
 import 'package:mcappen/utils/Network.dart';
 import 'package:mcappen/utils/Utils.dart';
-import 'package:mcappen/widgets/PlanTripUI.dart';
-import 'package:mcappen/widgets/Search.dart';
+import 'package:mcappen/views/plan_trip/PlanTripUI.dart';
+import 'package:mcappen/views/Search/Search.dart';
 
 
 
@@ -81,6 +79,9 @@ class _PlanTripState extends State<PlanTrip> {
   }
   
   void onFieldTap(int i) {    
+    if(RESTAsyncHandler != null) {
+      RESTAsyncHandler!.cancel();
+    }
     Navigator.push(
       context, 
       MaterialPageRoute(

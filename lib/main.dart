@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'views/Home.dart';
+import 'views/Home/Home.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 
 
 void main() {
@@ -14,10 +15,11 @@ class MyApp extends StatelessWidget {
       onTap: () {},
       child: MaterialApp(
         title: 'Flutter Demo',
-        theme: ThemeData(
+       theme: ThemeData(
           primarySwatch: Colors.blue,
           primaryColor: Colors.black,
         ),
+        
         home: HomePage(title: 'Flutter Demo Home Page'),
       ),
     );

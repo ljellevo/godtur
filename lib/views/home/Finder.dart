@@ -1,13 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mcappen/Classes/Location.dart';
-import 'package:mcappen/Stateless/SearchInputField.dart';
+import 'package:mcappen/components/SearchInputField.dart';
 import 'package:mcappen/utils/Network.dart';
 import 'package:mcappen/utils/Typedefs.dart';
 import 'package:mcappen/utils/Utils.dart';
-import 'package:mcappen/widgets/Search.dart';
-
-
+import 'package:mcappen/views/Search/Search.dart';
 
 class Finder extends StatefulWidget {
   final Network network;
@@ -59,7 +57,8 @@ class _FinderState extends State<Finder> {
       ),
     );
   }
-  
+   // Theme.of(context).backgroundColor
+   
   @override
   Widget build(BuildContext context) {
     return Positioned(

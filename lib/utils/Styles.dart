@@ -4,6 +4,15 @@ import 'package:flutter/material.dart';
 
 class Styles {
   
+  static const Color primary = Color(0xff0D2138);
+  static const Color blue = Color.fromRGBO(25, 118, 210, 1);
+  static const Color red = Color.fromRGBO(211, 47, 47, 1);
+  static const Color accent = Color.fromRGBO(187, 230, 228, 1);
+  static const Color error = Color.fromRGBO(238, 132, 52, 1);
+  static const Color primaryVariant = Color.fromRGBO(81, 91, 58, 1);
+  
+  
+  
   ButtonStyle lowProfileRoundButton(bool withShadow) {
     if(withShadow) {
       return  ButtonStyle(

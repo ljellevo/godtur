@@ -6,12 +6,12 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:mcappen/Classes/Location.dart';
 import 'package:mcappen/Classes/LocationForecast.dart';
 import 'package:mcappen/assets/Secrets.dart';
-import 'package:mcappen/components/FloatingPanel.dart';
+import 'package:mcappen/views/Home/FloatingPanel.dart';
 import 'package:mcappen/utils/CameraManager.dart';
 import 'package:mcappen/utils/LocationManager.dart';
 import 'package:mcappen/utils/Network.dart';
-import 'package:mcappen/widgets/Finder.dart';
-import 'package:mcappen/widgets/PlanTrip.dart';
+import 'package:mcappen/views/Home/Finder.dart';
+import 'package:mcappen/views/plan_trip/PlanTrip.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 

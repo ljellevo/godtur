@@ -3,12 +3,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:mcappen/Classes/CalculatedRouteWithForecast.dart';
-import 'package:mcappen/Classes/Coordinates.dart';
 import 'package:mcappen/Classes/Forecast.dart';
 import 'package:mcappen/Classes/Location.dart';
 import 'package:mcappen/Classes/LocationForecast.dart';
 import 'package:mcappen/Classes/Token.dart';
-import 'package:mcappen/widgets/PlanTrip.dart';
+import 'package:mcappen/views/plan_trip/PlanTrip.dart';
 
 class Network {
   

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mcappen/Classes/Location.dart';
 import 'package:mcappen/utils/Network.dart';
 import 'package:mcappen/utils/Typedefs.dart';
-import 'package:mcappen/widgets/SearchUI.dart';
+import 'package:mcappen/views/Search/SearchUI.dart';
 
 
 

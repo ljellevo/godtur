@@ -7,18 +7,19 @@ import 'package:mcappen/Classes/Location.dart';
 import 'package:mcappen/Classes/LocationForecast.dart';
 import 'package:mcappen/Classes/RouteLinesAndBounds.dart';
 import 'package:mcappen/Classes/TextControllerLocation.dart';
-import 'package:mcappen/Stateless/MediumButton.dart';
-import 'package:mcappen/Stateless/MediumButton.dart';
-import 'package:mcappen/Stateless/PlanTripSearchInputField.dart';
-import 'package:mcappen/Stateless/SearchInputField.dart';
-import 'package:mcappen/Stateless/SmallIconButton.dart';
-import 'package:mcappen/Stateless/LocationTimeline.dart';
-import 'package:mcappen/Stateless/TemperatureText.dart';
+import 'package:mcappen/components/MediumButton.dart';
+import 'package:mcappen/components/MediumButton.dart';
+import 'package:mcappen/views/plan_trip/PlanTrip.dart';
+import 'package:mcappen/views/plan_trip/PlanTripSearchInputField.dart';
+import 'package:mcappen/views/plan_trip/SummaryCard.dart';
+import 'package:mcappen/components/SearchInputField.dart';
+import 'package:mcappen/components/SmallIconButton.dart';
+import 'package:mcappen/views/plan_trip/LocationTimeline.dart';
+import 'package:mcappen/components/TemperatureText.dart';
 import 'package:mcappen/assets/Secrets.dart';
 import 'package:mcappen/utils/CameraManager.dart';
 import 'package:mcappen/utils/Network.dart';
 import 'package:mcappen/utils/Styles.dart';
-import 'package:mcappen/widgets/PlanTrip.dart';
 
 
 class PlanTripUI extends StatefulWidget {
@@ -207,46 +208,7 @@ class _PlanTripUIState extends State<PlanTripUI> {
         shrinkWrap: true,
         padding: EdgeInsets.fromLTRB(10, 10, 10, 30),
         children: [
-          Card(
-            child: Container(
-              padding: EdgeInsets.only(top: 10, bottom: 10),
-              child: Column(
-                children: [
-                  //Text("Oppsummering"),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Column(
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [ 
-                              Icon(Icons.keyboard_arrow_down, size: 24, color: widget.route!.getLowestAirTemperature().getCurrentAirTemperature() >= 0 ? Colors.red[700] : Colors.blue[700],),
-                              TemperatureText(locationRouteForecast: widget.route!.getLowestAirTemperature()),
-                            ],
-                          ),
-                          Text(widget.route!.getLowestAirTemperature().name)
-                        ],
-                      ),
-                      //Icon(Icons.keyboard_arrow_up)
-                      Column(
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              TemperatureText(locationRouteForecast: widget.route!.getHighestAirTemperature()),
-                              Icon(Icons.keyboard_arrow_up, size: 24, color: widget.route!.getHighestAirTemperature().getCurrentAirTemperature() >= 0 ? Colors.red[700] : Colors.blue[700],),
-                            ],
-                          ),
-                           Text(widget.route!.getHighestAirTemperature().name)
-                        ],
-                      )
-                    ],
-                  )
-                ],
-              ),
-            )
-          ),
+          SummaryCard(route: widget.route!),
           Card(
             child: Container(
               padding: EdgeInsets.all(20),
@@ -344,7 +306,17 @@ class _PlanTripUIState extends State<PlanTripUI> {
         ],
       );
     } else {
-      return Container();
+      return Center(
+        child: SizedBox(
+          width: 50,
+          height: 50,
+          child:  CircularProgressIndicator(
+            value: null,
+            strokeWidth: 5.0,
+            color: Colors.black,
+          )
+        ),
+      );
     }
   }
   

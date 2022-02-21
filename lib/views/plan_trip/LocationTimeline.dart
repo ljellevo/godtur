@@ -2,8 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:mcappen/Classes/CalculatedRouteWithForecast.dart';
 import 'package:mcappen/Classes/Location.dart';
-import 'package:mcappen/Stateless/ForecastTimeline.dart';
-import 'package:mcappen/Stateless/TemperatureText.dart';
+import 'package:mcappen/utils/Styles.dart';
+import 'package:mcappen/views/plan_trip/ForecastTimeline.dart';
+import 'package:mcappen/components/TemperatureText.dart';
 import 'package:mcappen/utils/Utils.dart';
 import 'package:timelines/timelines.dart';
 
@@ -104,11 +105,11 @@ class LocationTimeline extends StatelessWidget {
           indicatorBuilder: (_, index) {
             return OutlinedDotIndicator(
                 borderWidth: 2.5,
-                color: Colors.blueAccent,
+                color: Styles.blue,
               );
           },
           connectorBuilder: (_, index, ___) => SolidLineConnector(
-            color: Colors.blueAccent,
+            color: Styles.blue,
           ),
         )
       ),

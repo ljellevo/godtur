@@ -1,9 +1,8 @@
 
 import 'package:flutter/material.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:mcappen/Classes/Location.dart';
 import 'package:mcappen/Classes/LocationForecast.dart';
-import 'package:mcappen/components/ForecastList.dart';
+import 'package:mcappen/views/Home/ForecastList.dart';
 import 'package:mcappen/utils/Styles.dart';
 
 class FloatingPanel extends StatefulWidget {
@@ -61,7 +60,7 @@ class _FloatingPanelState extends State<FloatingPanel> {
                     offset: Offset(0, 0),
                   )
                 ]
-              ),
+              ), // Color.fromRGBO(204, 213, 174, 1),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
