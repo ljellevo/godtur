@@ -1,10 +1,8 @@
-
-
 import 'package:flutter/widgets.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
-import 'package:mcappen/Classes/Location.dart';
-import 'package:mcappen/Classes/LocationForecast.dart';
-import 'package:mcappen/utils/Network.dart';
+import 'package:godtur/Classes/Location.dart';
+import 'package:godtur/Classes/LocationForecast.dart';
+import 'package:godtur/utils/Network.dart';
 
 class LocationManager {
   Network network;

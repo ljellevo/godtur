@@ -1,6 +1,5 @@
-
 import 'package:flutter/material.dart';
-import 'package:mcappen/Classes/Location.dart';
+import 'package:godtur/Classes/Location.dart';
 
 class TextControllerLocation {
   

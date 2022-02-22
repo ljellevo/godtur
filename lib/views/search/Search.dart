@@ -1,9 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mcappen/Classes/Location.dart';
-import 'package:mcappen/utils/Network.dart';
-import 'package:mcappen/utils/Typedefs.dart';
-import 'package:mcappen/views/Search/SearchUI.dart';
+import 'package:godtur/Classes/Location.dart';
+import 'package:godtur/utils/Network.dart';
+import 'package:godtur/utils/Typedefs.dart';
+import 'package:godtur/views/Search/SearchUI.dart';
 
 
 

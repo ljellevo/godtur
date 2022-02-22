@@ -1,5 +1,3 @@
-
-
 class AlternativeName {
   String name;
   

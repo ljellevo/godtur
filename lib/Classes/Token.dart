@@ -1,5 +1,3 @@
-
-
 class Token {
   String accessToken;
   double expires;

@@ -1,6 +1,5 @@
-
 import 'package:flutter/material.dart';
-import 'package:mcappen/utils/Styles.dart';
+import 'package:godtur/utils/Statics.dart';
 
 class SmallIconButton extends StatelessWidget {
   final IconData icon;
@@ -20,7 +19,7 @@ class SmallIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton(
       style: TextButton.styleFrom(
-        backgroundColor: !selected! ? Colors.white : Styles.primary,
+        backgroundColor: !selected! ? Colors.white : Styles.secondary,
         shape: CircleBorder(),
       ),
       child: Icon(

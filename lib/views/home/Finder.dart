@@ -1,11 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mcappen/Classes/Location.dart';
-import 'package:mcappen/components/SearchInputField.dart';
-import 'package:mcappen/utils/Network.dart';
-import 'package:mcappen/utils/Typedefs.dart';
-import 'package:mcappen/utils/Utils.dart';
-import 'package:mcappen/views/Search/Search.dart';
+import 'package:godtur/Classes/Location.dart';
+import 'package:godtur/components/SearchInputField.dart';
+import 'package:godtur/utils/Network.dart';
+import 'package:godtur/utils/Typedefs.dart';
+import 'package:godtur/utils/Utils.dart';
+import 'package:godtur/views/Search/Search.dart';
 
 class Finder extends StatefulWidget {
   final Network network;

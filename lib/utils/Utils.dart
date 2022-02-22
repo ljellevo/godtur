@@ -1,10 +1,8 @@
-
-
 import 'package:flutter/cupertino.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
-import 'package:mcappen/Classes/CalculatedRouteWithForecast.dart';
-import 'package:mcappen/Classes/RouteLinesAndBounds.dart';
-import 'package:mcappen/Classes/Weather.dart';
+import 'package:godtur/Classes/CalculatedRouteWithForecast.dart';
+import 'package:godtur/Classes/RouteLinesAndBounds.dart';
+import 'package:godtur/Classes/Weather.dart';
 
 class Utils {
   

@@ -1,13 +1,12 @@
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mapbox_gl/mapbox_gl.dart';
-import 'package:mcappen/Classes/CalculatedRouteWithForecast.dart';
-import 'package:mcappen/Classes/Forecast.dart';
-import 'package:mcappen/Classes/Location.dart';
-import 'package:mcappen/Classes/LocationForecast.dart';
-import 'package:mcappen/Classes/Token.dart';
-import 'package:mcappen/views/plan_trip/PlanTrip.dart';
+import 'package:godtur/Classes/CalculatedRouteWithForecast.dart';
+import 'package:godtur/Classes/Forecast.dart';
+import 'package:godtur/Classes/Location.dart';
+import 'package:godtur/Classes/LocationForecast.dart';
+import 'package:godtur/Classes/Token.dart';
+import 'package:godtur/views/plan_trip/PlanTrip.dart';
 
 class Network {
   

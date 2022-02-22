@@ -1,7 +1,5 @@
-
-
-import 'package:mcappen/Classes/DirectionsCoordinates.dart';
-import 'package:mcappen/Classes/LocationRouteForecast.dart';
+import 'package:godtur/Classes/DirectionsCoordinates.dart';
+import 'package:godtur/Classes/LocationRouteForecast.dart';
 
 class CalculatedRouteWithForecast {
   DirectionsCoordinates directions;

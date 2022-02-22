@@ -1,5 +1,3 @@
-
-
 class Coordinates {
   List<double> coordinates;
   

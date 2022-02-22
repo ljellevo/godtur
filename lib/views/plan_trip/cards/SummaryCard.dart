@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mcappen/Classes/CalculatedRouteWithForecast.dart';
-import 'package:mcappen/components/TemperatureText.dart';
+import 'package:godtur/Classes/CalculatedRouteWithForecast.dart';
+import 'package:godtur/components/TemperatureText.dart';
 
 class SummaryCard extends StatelessWidget {
   final CalculatedRouteWithForecast route;
@@ -13,6 +13,7 @@ class SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      elevation: 4,
       child: Container(
         padding: EdgeInsets.only(top: 10, bottom: 10),
         child: Column(

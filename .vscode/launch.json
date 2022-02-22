@@ -5,12 +5,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "mcappen",
+      "name": "GodTur",
       "request": "launch",
       "type": "dart"
     },
     {
-      "name": "mcappen (profile mode)",
+      "name": "GodTur (profile mode)",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile"

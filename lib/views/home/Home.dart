@@ -1,17 +1,15 @@
 import 'dart:math';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
-import 'package:mcappen/Classes/Location.dart';
-import 'package:mcappen/Classes/LocationForecast.dart';
-import 'package:mcappen/assets/Secrets.dart';
-import 'package:mcappen/views/Home/FloatingPanel.dart';
-import 'package:mcappen/utils/CameraManager.dart';
-import 'package:mcappen/utils/LocationManager.dart';
-import 'package:mcappen/utils/Network.dart';
-import 'package:mcappen/views/Home/Finder.dart';
-import 'package:mcappen/views/plan_trip/PlanTrip.dart';
+import 'package:godtur/Classes/Location.dart';
+import 'package:godtur/Classes/LocationForecast.dart';
+import 'package:godtur/assets/Secrets.dart';
+import 'package:godtur/views/Home/FloatingPanel.dart';
+import 'package:godtur/utils/CameraManager.dart';
+import 'package:godtur/utils/LocationManager.dart';
+import 'package:godtur/utils/Network.dart';
+import 'package:godtur/views/Home/Finder.dart';
+import 'package:godtur/views/plan_trip/PlanTrip.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 

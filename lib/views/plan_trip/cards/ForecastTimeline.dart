@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mcappen/Classes/CalculatedRouteWithForecast.dart';
-import 'package:mcappen/Classes/Forecast.dart';
-import 'package:mcappen/Classes/LocationForecast.dart';
-import 'package:mcappen/components/TemperatureText.dart';
-import 'package:mcappen/utils/Styles.dart';
-import 'package:mcappen/utils/Utils.dart';
+import 'package:godtur/Classes/CalculatedRouteWithForecast.dart';
+import 'package:godtur/components/TemperatureText.dart';
+import 'package:godtur/utils/Statics.dart';
+import 'package:godtur/utils/Utils.dart';
 import 'package:timelines/timelines.dart';
 
 class ForecastTimeline extends StatelessWidget {

@@ -1,10 +1,6 @@
-
-
-import 'package:mcappen/Classes/AlternativeName.dart';
-import 'package:mcappen/Classes/Coordinates.dart';
-import 'package:mcappen/Classes/Forecast.dart';
-import 'package:mcappen/Classes/GeoJson.dart';
-import 'package:mcappen/Classes/Weather.dart';
+import 'package:godtur/Classes/Forecast.dart';
+import 'package:godtur/Classes/GeoJson.dart';
+import 'package:godtur/Classes/Weather.dart';
 
 class LocationRouteForecast {
   String name;

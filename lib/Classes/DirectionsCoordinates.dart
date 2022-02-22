@@ -1,5 +1,3 @@
-
-
 class DirectionsCoordinates {
   List<List<double>> coordinates;
   

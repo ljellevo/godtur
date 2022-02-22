@@ -1,25 +1,21 @@
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:godtur/components/Loading.dart';
+import 'package:godtur/utils/Statics.dart';
+import 'package:godtur/views/plan_trip/cards/DismissableCard.dart';
+import 'package:godtur/views/plan_trip/cards/DistanceDurationCard.dart';
+import 'package:godtur/views/plan_trip/cards/MapCard.dart';
+import 'package:godtur/views/plan_trip/cards/OpenNavigationCard.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
-import 'package:mcappen/Classes/CalculatedRouteWithForecast.dart';
-import 'package:mcappen/Classes/Location.dart';
-import 'package:mcappen/Classes/LocationForecast.dart';
-import 'package:mcappen/Classes/RouteLinesAndBounds.dart';
-import 'package:mcappen/Classes/TextControllerLocation.dart';
-import 'package:mcappen/components/MediumButton.dart';
-import 'package:mcappen/components/MediumButton.dart';
-import 'package:mcappen/views/plan_trip/PlanTrip.dart';
-import 'package:mcappen/views/plan_trip/PlanTripSearchInputField.dart';
-import 'package:mcappen/views/plan_trip/SummaryCard.dart';
-import 'package:mcappen/components/SearchInputField.dart';
-import 'package:mcappen/components/SmallIconButton.dart';
-import 'package:mcappen/views/plan_trip/LocationTimeline.dart';
-import 'package:mcappen/components/TemperatureText.dart';
-import 'package:mcappen/assets/Secrets.dart';
-import 'package:mcappen/utils/CameraManager.dart';
-import 'package:mcappen/utils/Network.dart';
-import 'package:mcappen/utils/Styles.dart';
+import 'package:godtur/Classes/CalculatedRouteWithForecast.dart';
+import 'package:godtur/Classes/Location.dart';
+import 'package:godtur/Classes/RouteLinesAndBounds.dart';
+import 'package:godtur/components/MediumButton.dart';
+import 'package:godtur/views/plan_trip/PlanTrip.dart';
+import 'package:godtur/views/plan_trip/PlanTripSearchInputField.dart';
+import 'package:godtur/views/plan_trip/cards/SummaryCard.dart';
+import 'package:godtur/components/SmallIconButton.dart';
+import 'package:godtur/views/plan_trip/cards/LocationTimelineCard.dart';
+import 'package:godtur/utils/Network.dart';
 
 
 class PlanTripUI extends StatefulWidget {
@@ -138,7 +134,7 @@ class _PlanTripUIState extends State<PlanTripUI> {
               PlanTripSearchInputField(
                 focus: FocusNode(), 
                 controller: widget.searchControllers[i],
-                placeholder: "Søk etter lokasjon",
+                placeholder: Statics.SEARCHFIELD_PLACEHOLDER_TEXT,
                 index: i,
                 readOnly: true,
                 clearSearch: () {
@@ -170,6 +166,7 @@ class _PlanTripUIState extends State<PlanTripUI> {
         alignment: MainAxisAlignment.spaceAround,
         children: [
           SmallIconButton(
+            color: Styles.secondary,
             icon: Icons.add_circle_outline, 
             onTap: () {
               WidgetsBinding.instance!.addPostFrameCallback((_) => {_scrollController.jumpTo(_scrollController.position.maxScrollExtent)});
@@ -179,6 +176,7 @@ class _PlanTripUIState extends State<PlanTripUI> {
           SmallIconButton(
             selected: widget.traficType == TraficType.Driving,
             icon: Icons.drive_eta, 
+            color: Styles.secondary,
             onTap: () {
               widget.changeTraficType(TraficType.Driving);
             },
@@ -186,6 +184,7 @@ class _PlanTripUIState extends State<PlanTripUI> {
           SmallIconButton(
             selected: widget.traficType == TraficType.Walking,
             icon: Icons.directions_walk, 
+            color: Styles.secondary,
             onTap: () {
               widget.changeTraficType(TraficType.Walking);
             },
@@ -193,6 +192,7 @@ class _PlanTripUIState extends State<PlanTripUI> {
           SmallIconButton(
             selected: widget.traficType == TraficType.Cycling,
             icon: Icons.pedal_bike,
+            color: Styles.secondary,
             onTap: () {
               widget.changeTraficType(TraficType.Cycling);
             },
@@ -208,115 +208,36 @@ class _PlanTripUIState extends State<PlanTripUI> {
         shrinkWrap: true,
         padding: EdgeInsets.fromLTRB(10, 10, 10, 30),
         children: [
+          DissmissableCard(text: Statics.INFORMATION_DISSMISSABLE_CARD_MESSAGE, onPressed: (){},),
           SummaryCard(route: widget.route!),
-          Card(
-            child: Container(
-              padding: EdgeInsets.all(20),
-              child: LocationTimeline(
-                route: widget.route!,
-              ),
-            )
-          ),
-          Card(
-            child: Container(
-              padding: EdgeInsets.only(top: 10, bottom: 10),
-              child: Column(
-                children: [
-                  //Text("Oppsummering"),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Column(
-                        children: [
-                          Text(
-                            widget.route!.getTotalDistance().toString(),
-                            style: TextStyle(
-                              fontSize: 34
-                            ),
-                          )
-                        ],
-                      ),
-                      //Icon(Icons.keyboard_arrow_up)
-                      Column(
-                        children: [
-                          Text(
-                            widget.route!.getTotalDuration().toString(),
-                            style: TextStyle(
-                              fontSize: 34
-                            ),
-                          )
-                        ],
-                      ),
-                      
-                    ],
-                  ),
-                  Text(
-                    "(Distanse og tid er kun estimater)",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey
-                    ),
-                  )
-                ],
-              ),
-            )
-          ),
-          Card(
-            child: Container(
-              height: 400,
-              child: MapboxMap(
-                accessToken: Secrets.MAPBOX_ACCESS_TOKEN,
-                onMapCreated: widget.onMapLoaded,
-                initialCameraPosition: CameraPosition(target: LatLng( widget.route!.locations[widget.route!.locations.length - 1].geoJson.coordinates[0][1],  widget.route!.locations[widget.route!.locations.length - 1].geoJson.coordinates[0][0]), zoom: 10),
-                styleString: Secrets.MAPBOX_STYLE_URL,
-                onCameraIdle: widget.onMapIdle,
-                compassEnabled: false,
-                rotateGesturesEnabled: false,
-                scrollGesturesEnabled: false,
-                zoomGesturesEnabled: false,
-                tiltGesturesEnabled: false,
-                //cameraTargetBounds: CameraTargetBounds(LatLngBounds(southwest: widget.southwest!, northeast: widget.northeast!)),
-              ),
-            )
-          ),
-          Card(
-            child: Container(
-              padding: EdgeInsets.only(top: 10, bottom: 10),
-              child: Column(
-                children: [
-                  //Text("Oppsummering"),
-                  Text(
-                    "Navigasjon N/A",
-                    style: TextStyle(
-                      fontSize: 32,
-                      color: Colors.grey
-                    ),
-                  ),
-                  Text(
-                    "Åpner google maps",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey
-                    ),
-                  ),
-                ],
-              ),
-            )
-          ),
+          LocationTimelineCard(route: widget.route!),
+          DistanceDurationCard(route: widget.route!),
+          MapCard(route: widget.route!, onMapLoaded: widget.onMapLoaded, onMapIdle: widget.onMapIdle),
+          OpenNavigationCard(route: widget.route!)
         ],
       );
     } else {
-      return Center(
-        child: SizedBox(
-          width: 50,
-          height: 50,
-          child:  CircularProgressIndicator(
-            value: null,
-            strokeWidth: 5.0,
-            color: Colors.black,
-          )
-        ),
-      );
+      if(widget.locations.length < 2) {
+        return Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.warning_amber_rounded,
+                color: Styles.secondary,
+              ),
+              Text(
+                Statics.LESS_THAN_TWO_LOCATIONS_MESSAGE,
+                style: TextStyle(
+                  color: Styles.accent
+                ),
+              )
+            ],
+          ),
+        );
+      } else {
+        return Loading();
+      }
     }
   }
   
@@ -328,6 +249,7 @@ class _PlanTripUIState extends State<PlanTripUI> {
       children: [
         Container(
           child: Container(
+            color: Colors.white,
             padding: EdgeInsets.only(top: widget.searchControllers.length == 2 ? 220 : 270),
             child: planTripResultList(),
           )

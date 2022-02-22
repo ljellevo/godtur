@@ -1,13 +1,9 @@
-
-
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:mcappen/Classes/Location.dart';
-import 'package:mcappen/Classes/LocationForecast.dart';
-import 'package:mcappen/Classes/Weather.dart';
-import 'package:mcappen/views/Home/OverlayStickyListItem.dart';
-import 'package:mcappen/utils/Styles.dart';
-import 'package:mcappen/utils/Utils.dart';
+import 'package:godtur/Classes/Location.dart';
+import 'package:godtur/Classes/LocationForecast.dart';
+import 'package:godtur/Classes/Weather.dart';
+import 'package:godtur/views/Home/OverlayStickyListItem.dart';
+import 'package:godtur/utils/Utils.dart';
 import 'package:sticky_infinite_list/sticky_infinite_list.dart';
 
 class ForecastList extends StatefulWidget {

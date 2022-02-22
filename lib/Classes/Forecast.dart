@@ -1,6 +1,4 @@
-
-
-import 'package:mcappen/Classes/Weather.dart';
+import 'package:godtur/Classes/Weather.dart';
 
 class Forecast {
   int updatedAt;

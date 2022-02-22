@@ -1,7 +1,5 @@
 
-
-import 'package:mcappen/Classes/Coordinates.dart';
-import 'package:mcappen/Classes/GeoJson.dart';
+import 'package:godtur/Classes/GeoJson.dart';
 
 class Location {
   String name;

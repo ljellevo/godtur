@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'views/Home/Home.dart';
-import 'package:flex_color_scheme/flex_color_scheme.dart';
+
+import 'package:hive_flutter/hive_flutter.dart';
 
 
-void main() {
+void main() async {
+  await Hive.initFlutter();
+  await Hive.openBox('settings');
   runApp(MyApp());
 }
 

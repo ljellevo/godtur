@@ -1,5 +1,3 @@
-
-
 class Weather {
   int time;
   num airTemperature;

@@ -1,4 +1,4 @@
-import 'package:mcappen/Classes/Location.dart';
+import 'package:godtur/Classes/Location.dart';
 
 //typedef SetSearchResultCallback = Function(Location? location);
 typedef SetSelectedLocation = Function(Location? location);

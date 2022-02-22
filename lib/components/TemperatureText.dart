@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mcappen/Classes/LocationRouteForecast.dart';
+import 'package:godtur/Classes/LocationRouteForecast.dart';
 
 class TemperatureText extends StatelessWidget {
   final LocationRouteForecast locationRouteForecast;

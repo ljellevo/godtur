@@ -1,17 +1,15 @@
-
 import 'package:flutter/material.dart';
-import 'package:mcappen/Classes/CalculatedRouteWithForecast.dart';
-import 'package:mcappen/Classes/Location.dart';
-import 'package:mcappen/utils/Styles.dart';
-import 'package:mcappen/views/plan_trip/ForecastTimeline.dart';
-import 'package:mcappen/components/TemperatureText.dart';
-import 'package:mcappen/utils/Utils.dart';
+import 'package:godtur/Classes/CalculatedRouteWithForecast.dart';
+import 'package:godtur/utils/Statics.dart';
+import 'package:godtur/views/plan_trip/cards/ForecastTimeline.dart';
+import 'package:godtur/components/TemperatureText.dart';
+import 'package:godtur/utils/Utils.dart';
 import 'package:timelines/timelines.dart';
 
-class LocationTimeline extends StatelessWidget {
+class LocationTimelineCard extends StatelessWidget {
   final CalculatedRouteWithForecast route;
   
-  LocationTimeline({
+  LocationTimelineCard({
     required this.route,
     Key? key
   }) : super(key: key);
@@ -75,44 +73,51 @@ class LocationTimeline extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: FixedTimeline.tileBuilder(
-        theme: TimelineThemeData(
-          nodePosition: 0,
-          color: Color(0xff989898),
-          indicatorTheme: IndicatorThemeData(
-            position: 0,
-            size: 20.0,
-          ),
-          connectorTheme: ConnectorThemeData(
-            thickness: 2.5,
-          ),
-        ),
-        builder: TimelineTileBuilder.connected(
-          connectionDirection: ConnectionDirection.before,
-          itemCount: 2,
-          contentsBuilder: (_, index) {
-            return Container(
-              padding: EdgeInsets.only(left: 8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: getListContent(context, index == 0 ? 0 : route.locations.length -1),
+    
+    return Card(
+      elevation: 4,
+      child: Container(
+        padding: EdgeInsets.all(20),
+        child: SingleChildScrollView(
+          child: FixedTimeline.tileBuilder(
+            theme: TimelineThemeData(
+              nodePosition: 0,
+              color: Color(0xff989898),
+              indicatorTheme: IndicatorThemeData(
+                position: 0,
+                size: 20.0,
               ),
-            );
-          },
-          
-          indicatorBuilder: (_, index) {
-            return OutlinedDotIndicator(
-                borderWidth: 2.5,
+              connectorTheme: ConnectorThemeData(
+                thickness: 2.5,
+              ),
+            ),
+            builder: TimelineTileBuilder.connected(
+              connectionDirection: ConnectionDirection.before,
+              itemCount: 2,
+              contentsBuilder: (_, index) {
+                return Container(
+                  padding: EdgeInsets.only(left: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: getListContent(context, index == 0 ? 0 : route.locations.length -1),
+                  ),
+                );
+              },
+              
+              indicatorBuilder: (_, index) {
+                return OutlinedDotIndicator(
+                    borderWidth: 2.5,
+                    color: Styles.blue,
+                  );
+              },
+              connectorBuilder: (_, index, ___) => SolidLineConnector(
                 color: Styles.blue,
-              );
-          },
-          connectorBuilder: (_, index, ___) => SolidLineConnector(
-            color: Styles.blue,
+              ),
+            )
           ),
         )
-      ),
+      )
     );
   }
 }

@@ -1,9 +1,8 @@
-
 import 'package:flutter/material.dart';
-import 'package:mcappen/Classes/Location.dart';
-import 'package:mcappen/Classes/LocationForecast.dart';
-import 'package:mcappen/views/Home/ForecastList.dart';
-import 'package:mcappen/utils/Styles.dart';
+import 'package:godtur/Classes/Location.dart';
+import 'package:godtur/Classes/LocationForecast.dart';
+import 'package:godtur/views/Home/ForecastList.dart';
+import 'package:godtur/utils/Statics.dart';
 
 class FloatingPanel extends StatefulWidget {
   final Location? selectedLocation;
@@ -78,20 +77,22 @@ class _FloatingPanelState extends State<FloatingPanel> {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           widget.selectedLocation!.name,
                           style: TextStyle(
-                            fontSize: 28
+                            fontSize: 28,
+                            color: Styles.primary
                           ),
                         ),
                         Text(
                           widget.selectedLocation!.locationType,
                           style: TextStyle(
-                            fontSize: 18
+                            fontSize: 18,
+                            color: Styles.primary
                           ),
                         )
                       ],
@@ -102,7 +103,8 @@ class _FloatingPanelState extends State<FloatingPanel> {
                     child: Text(
                       widget.selectedLocation!.municipality + " • " + widget.selectedLocation!.county,
                       style: TextStyle(
-                        fontSize: 14
+                        fontSize: 14,
+                            color: Styles.primary
                       ),
                     ),
                   ),
@@ -141,7 +143,7 @@ class _FloatingPanelState extends State<FloatingPanel> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   TextButton(
-                    style: Styles().roundButton(Colors.white, Colors.green),
+                    style: Styles().roundButton(Colors.white, Styles.secondary),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
@@ -158,7 +160,9 @@ class _FloatingPanelState extends State<FloatingPanel> {
                     onPressed: (){
                       widget.planTrip();
                     },
-                  ),TextButton(
+                  ),
+                  /*
+                  TextButton(
                     style: Styles().roundButton(Colors.white, Colors.orange),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -177,6 +181,7 @@ class _FloatingPanelState extends State<FloatingPanel> {
                       widget.addToFavorites();
                     },
                   ),
+                  */
                 ],
               )
             )

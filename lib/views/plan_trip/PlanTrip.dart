@@ -1,17 +1,14 @@
 import 'dart:async';
-
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
-import 'package:mcappen/Classes/CalculatedRouteWithForecast.dart';
-import 'package:mcappen/Classes/Location.dart';
-import 'package:mcappen/Classes/RouteLinesAndBounds.dart';
-import 'package:mcappen/Classes/TextControllerLocation.dart';
-import 'package:mcappen/utils/Network.dart';
-import 'package:mcappen/utils/Utils.dart';
-import 'package:mcappen/views/plan_trip/PlanTripUI.dart';
-import 'package:mcappen/views/Search/Search.dart';
+import 'package:godtur/Classes/CalculatedRouteWithForecast.dart';
+import 'package:godtur/Classes/Location.dart';
+import 'package:godtur/Classes/RouteLinesAndBounds.dart';
+import 'package:godtur/Classes/TextControllerLocation.dart';
+import 'package:godtur/utils/Network.dart';
+import 'package:godtur/utils/Utils.dart';
+import 'package:godtur/views/plan_trip/PlanTripUI.dart';
+import 'package:godtur/views/Search/Search.dart';
 
 
 
@@ -105,7 +102,7 @@ class _PlanTripState extends State<PlanTrip> {
     setState(() {});
   }
   
-  void clearField(int i) {
+  void clearField(int i) {    
     setState(() {
       locationControllers[i].getController().clear();
       locationControllers[i].setLocation(null);
@@ -184,8 +181,8 @@ class _PlanTripState extends State<PlanTrip> {
   void changeTraficType(TraficType newType) async {
     setState(() {
       traficType = newType;
-      //route = null;
     });
+    
     await _getRoute(locationControllers, traficType);
     updateMapRoute();
   }
@@ -193,6 +190,9 @@ class _PlanTripState extends State<PlanTrip> {
   
   // Anonomus functions
   Future<bool> _getRoute(List<TextControllerLocation> locationControllers, TraficType traficType) async {
+    setState(() {
+      route = null;
+    });
     List<Location> locations = [];
     for(var loc in locationControllers){
       if(loc.getLocation() != null){
@@ -201,7 +201,6 @@ class _PlanTripState extends State<PlanTrip> {
     }
     
     RESTAsyncHandler = widget.network.getRouteBetweenLocations(locations, traficType).asStream().listen((CalculatedRouteWithForecast? route) { 
-      print("Response gotten");
       setState(() {
         if(route != null){
           routeLinesAndBounds = Utils().getBounds(route);
@@ -209,16 +208,6 @@ class _PlanTripState extends State<PlanTrip> {
         this.route = route;
       });
     });
-    
-    /*
-    route = await widget.network.getRouteBetweenLocations(locations, traficType);
-    setState(() {
-      if(route != null){
-        print("got route");
-      }
-      route = route;
-    });
-    */
     return true;
   }
   
@@ -230,8 +219,9 @@ class _PlanTripState extends State<PlanTrip> {
   }
   
   void updateMapRoute() async {
-    await mapController!.clearLines();
-    mapController!.addLine(
+    if(mapController != null) {
+      await mapController!.clearLines();
+      mapController!.addLine(
         LineOptions(
           geometry: routeLinesAndBounds.getGeoJson(),
           lineColor: "#ff0000",
@@ -240,7 +230,8 @@ class _PlanTripState extends State<PlanTrip> {
           draggable: false
         ),
       );
-    mapController!.moveCamera(CameraUpdate.newLatLngBounds(LatLngBounds(southwest: routeLinesAndBounds.getSouthwest()!, northeast: routeLinesAndBounds.getNortheast()!), left: 50, top: 50, bottom: 50, right: 50));
+      mapController!.moveCamera(CameraUpdate.newLatLngBounds(LatLngBounds(southwest: routeLinesAndBounds.getSouthwest()!, northeast: routeLinesAndBounds.getNortheast()!), left: 50, top: 50, bottom: 50, right: 50));
+    }
   }
   
   void onMapIdle() {

@@ -1,6 +1,6 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:godtur/utils/Statics.dart';
 
 class SearchInputField extends StatelessWidget {
   
@@ -56,7 +56,7 @@ class SearchInputField extends StatelessWidget {
       return BoxDecoration(
         border: Border.all(
           width: 2,
-          color: Color(0xff0D2138)
+          color: Styles.primary
         ),
         borderRadius: BorderRadius.circular(10),
         color: Colors.white,
@@ -77,18 +77,24 @@ class SearchInputField extends StatelessWidget {
           focusNode: focus,
           controller: controller,
           placeholder: placeholder,
-          style: TextStyle(color: Color(0xff0D2138)),
+          style: TextStyle(color: Styles.primary),
           prefix: Container(
             padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
             child: IconButton(
-              icon: Icon(Icons.search),
+              icon: Icon(
+                Icons.search,
+                color: Styles.primary,
+              ),
               onPressed: () {}
             ),
           ),
           suffix: controller.value.text != "" ? Container(
             padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
             child: IconButton(
-              icon: Icon(Icons.cancel),
+              icon: Icon(
+                Icons.cancel,
+                color: Styles.primary,
+              ),
               onPressed: clearSearch
             ),
           ): null,

@@ -1,11 +1,10 @@
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mcappen/components/MediumButton.dart';
-import 'package:mcappen/components/SearchInputField.dart';
-import 'package:mcappen/utils/Network.dart';
-import 'package:mcappen/utils/Typedefs.dart';
-import 'package:mcappen/views/Search/SearchResult.dart';
+import 'package:godtur/components/MediumButton.dart';
+import 'package:godtur/components/SearchInputField.dart';
+import 'package:godtur/utils/Network.dart';
+import 'package:godtur/utils/Statics.dart';
+import 'package:godtur/utils/Typedefs.dart';
+import 'package:godtur/views/Search/SearchResult.dart';
 
 
 
@@ -58,6 +57,7 @@ class _SearchUIState extends State<SearchUI> {
       children: [  
         MediumButton(
           icon: Icons.chevron_left,
+          color: Styles.primary,
           onTap: widget.cancelSearch,
         ),
         SearchInputField(

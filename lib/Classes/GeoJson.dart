@@ -1,9 +1,3 @@
-
-
-import 'dart:convert';
-
-import 'package:mcappen/Classes/Coordinates.dart';
-
 class GeoJson {
   List<List<double>> coordinates;
   String type;
